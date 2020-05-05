@@ -15,4 +15,8 @@ public interface SubQuestionDetailMapper extends Mapper<SubQuestionDetail> {
     @Select("select t.* from t_sub_question_detail t where t.title is NULL and t.snap_time=#{param1} limit #{param2} ")
     @ResultMap("BaseResultMap")
     List<SubQuestionDetail> findLastN(String snapTime, int limit);
+
+    @Select("select t.* from t_sub_question_detail t where t.question_id=#{param1} order by t.update_time DESC")
+    @ResultMap("BaseResultMap")
+    List<SubQuestionDetail> findListByQuestionId(int qid);
 }

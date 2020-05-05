@@ -6,4 +6,8 @@ public class Const {
     public static final int VALID_ALL = -1;
 
     public static final int PROXY_INVALID = -1;
+    public static final int TYPE_HOUR = 1;
+    public static final int TYPE_DAY = 2;
+
+
 }

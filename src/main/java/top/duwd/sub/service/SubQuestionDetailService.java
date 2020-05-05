@@ -2,6 +2,8 @@ package top.duwd.sub.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Example;
 import top.duwd.common.config.Const;
+import top.duwd.common.domain.sub.entity.SubQuestion;
 import top.duwd.common.domain.sub.entity.SubQuestionDetail;
 import top.duwd.common.domain.zhihu.ZhihuQuestionEntity;
 import top.duwd.common.mapper.sub.SubQuestionDetailMapper;
@@ -199,4 +202,21 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
         return list;
     }
 
+
+    public List<SubQuestionDetail> questionDetails(Integer questionId, Integer type) {
+        List<SubQuestionDetail> list = null;
+        switch (type){
+            case Const.TYPE_HOUR:
+                PageHelper.startPage(1,24);
+                list = subQuestionDetailMapper.findListByQuestionId(questionId);
+                break;
+            case Const.TYPE_DAY:
+                break;
+            default:
+                break;
+        }
+
+        return list;
+
+    }
 }

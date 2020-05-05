@@ -1,5 +1,7 @@
 package top.duwd.sub.job;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -63,7 +65,8 @@ public class QuestionSnapJob {
 
         List<SubQuestionDetail> lastN = subQuestionDetailService.findLastN(snapTime, 20);
         if (lastN == null || lastN.size() == 0) {
-            dbSet.clear();return;
+            dbSet.clear();
+            return;
         }
 
         Set<Integer> dbQidSet = lastN.stream().map(SubQuestionDetail::getQuestionId).collect(Collectors.toSet());
@@ -97,14 +100,9 @@ public class QuestionSnapJob {
     }
 
     private String getSnapTime(Date date) {
-        String pattern = "yyyyMMddhh";
-        return dateStringToPatternTime(date, pattern);
+        return JSON.toJSONString(date, SerializerFeature.WriteDateUseDateFormat).replace(" ", "-").substring(1, 14);
     }
 
-    private String dateStringToPatternTime(Date date, String pattern) {
-        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-        return sdf.format(date);
-    }
 
     private List<SubQuestionDetail> genListFromQuestionIdList(List<Integer> qidList, Date date, String snapTime) {
         List<SubQuestionDetail> list = new ArrayList<>(qidList.size());
@@ -118,5 +116,4 @@ public class QuestionSnapJob {
         }
         return list;
     }
-
 }
