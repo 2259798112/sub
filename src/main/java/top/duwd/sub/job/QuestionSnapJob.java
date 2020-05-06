@@ -47,13 +47,27 @@ public class QuestionSnapJob {
             return;
         }
 
+        if (StringUtils.isEmpty(SNAP_TIME)){
+            setNextHourSnapTime();
+        }
+
+        List<SubQuestionDetail> details = genListFromQuestionIdList(qidList, new Date(), SNAP_TIME);
+        subQuestionDetailService.insertList(details, 1000);
+    }
+
+
+    @Scheduled(cron = "0 10 * * * ?")
+    public void snapTime() {
+        setNextHourSnapTime();
+    }
+
+    public void setNextHourSnapTime(){
+        log.info("setNextHourSnapTime");
         Date date = DateUtil.addMin(new Date(), 60);
         String snapTime = getSnapTime(date);
-
-        List<SubQuestionDetail> details = genListFromQuestionIdList(qidList, date, snapTime);
-        subQuestionDetailService.insertList(details, 1000);
         SNAP_TIME = snapTime;
     }
+
 
 
     @Async("SubExecutor")

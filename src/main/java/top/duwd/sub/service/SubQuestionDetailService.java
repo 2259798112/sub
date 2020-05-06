@@ -76,6 +76,7 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
             for (List<SubQuestionDetail> details : splitList) {
                 count += subQuestionDetailMapper.insertList(details);
             }
+            log.info("insertList count={}",count);
             return count;
         }
     }
