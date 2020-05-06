@@ -39,8 +39,9 @@ public class QuestionSnapJob {
     public static String SNAP_TIME = "";
 
 
-    @Scheduled(cron = "0 30 * * * ?")
+    @Scheduled(cron = "0 55 * * * ?")
     public void run() {
+        log.info("subQuestionDetailService.insertList");
         List<Integer> qidList = subQuestionService.findValidQuestion();
         if (qidList == null) {
             return;
@@ -60,11 +61,13 @@ public class QuestionSnapJob {
     public void snap() {
         String snapTime = getSnapTime(DateUtil.addMin(new Date(), 0));
         if (StringUtils.isEmpty(SNAP_TIME) || !snapTime.equalsIgnoreCase(SNAP_TIME)) {
+            log.info("snapTime={} SNAP_TIME={}",snapTime,SNAP_TIME);
             return;
         }
 
         List<SubQuestionDetail> lastN = subQuestionDetailService.findLastN(snapTime, 20);
         if (lastN == null || lastN.size() == 0) {
+            log.info("lastN={}",JSON.toJSONString(lastN));
             dbSet.clear();
             return;
         }
