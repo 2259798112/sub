@@ -68,14 +68,17 @@ public class QuestionSnapJob {
         SNAP_TIME = snapTime;
     }
 
-
+    @Scheduled(fixedRate = 1000*60*2)
+    public void clear() {
+        dbSet.clear();
+    }
 
     @Async("SubExecutor")
     @Scheduled(fixedRate = 200)
     public void snap() {
         String snapTime = getSnapTime(DateUtil.addMin(new Date(), 0));
         if (StringUtils.isEmpty(SNAP_TIME) || !snapTime.equalsIgnoreCase(SNAP_TIME)) {
-            log.info("snapTime={} SNAP_TIME={}",snapTime,SNAP_TIME);
+//            log.info("snapTime={} SNAP_TIME={}",snapTime,SNAP_TIME);
             return;
         }
 
