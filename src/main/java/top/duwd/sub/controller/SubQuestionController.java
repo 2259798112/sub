@@ -37,9 +37,9 @@ public class SubQuestionController {
 
     @GetMapping("/one")
     public ApiResult questionDetails(@RequestParam(value = "questionId") Integer questionId, @RequestParam(value = "type") Integer type) {
-
         //type 0 hour 最近24, 1 day 最近7天
         List<SubQuestionDetail> list = subQuestionDetailService.questionDetails(questionId, type);
         return apm.success(list);
     }
+
 }

@@ -23,6 +23,12 @@
         <okhttp3.version>4.2.2</okhttp3.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -92,6 +98,12 @@
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>1.1.17</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.yinjihuan</groupId>
+            <artifactId>elastic-job-spring-boot-starter</artifactId>
+            <version>1.0.5</version>
         </dependency>
 
     </dependencies>

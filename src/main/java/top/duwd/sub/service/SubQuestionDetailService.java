@@ -3,7 +3,7 @@ package top.duwd.sub.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,14 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Example;
 import top.duwd.common.config.Const;
-import top.duwd.common.domain.sub.entity.SubQuestion;
 import top.duwd.common.domain.sub.entity.SubQuestionDetail;
 import top.duwd.common.domain.zhihu.ZhihuQuestionEntity;
 import top.duwd.common.mapper.sub.SubQuestionDetailMapper;
 import top.duwd.common.service.proxy.ProxyService;
 import top.duwd.common.util.CollectionUtil;
 import top.duwd.dutil.http.RequestBuilder;
-import top.duwd.sub.job.QuestionSnapJob;
+import top.duwd.sub.job.ElasticQuestionPrepareJob;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -68,6 +67,7 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
 
     @Transactional
     public int insertList(List<SubQuestionDetail> list, int pageSize) {
+        log.info("insertList count={}", list.size());
         if (list.size() < pageSize) {
             return subQuestionDetailMapper.insertList(list);
         } else {
@@ -76,7 +76,6 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
             for (List<SubQuestionDetail> details : splitList) {
                 count += subQuestionDetailMapper.insertList(details);
             }
-            log.info("insertList count={}",count);
             return count;
         }
     }
@@ -157,7 +156,11 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
                     SubQuestionDetail subQuestionDetailEntity = new SubQuestionDetail();
                     BeanUtils.copyProperties(entity, subQuestionDetailEntity);
                     subQuestionDetailEntity.setQuestionId(entity.getId());
-                    subQuestionDetailEntity.setSnapTime(QuestionSnapJob.SNAP_TIME);
+
+                    if (StringUtils.isEmpty(ElasticQuestionPrepareJob.SNAP_TIME)) {
+                        ElasticQuestionPrepareJob.SNAP_TIME = ElasticQuestionPrepareJob.getSnapTime(new Date());
+                    }
+                    subQuestionDetailEntity.setSnapTime(ElasticQuestionPrepareJob.SNAP_TIME);
 
                     try {
                         count += updateAndSave(subQuestionDetailEntity);
@@ -206,9 +209,9 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
 
     public List<SubQuestionDetail> questionDetails(Integer questionId, Integer type) {
         List<SubQuestionDetail> list = null;
-        switch (type){
+        switch (type) {
             case Const.TYPE_HOUR:
-                PageHelper.startPage(1,24);
+                PageHelper.startPage(1, 24);
                 list = subQuestionDetailMapper.findListByQuestionId(questionId);
                 break;
             case Const.TYPE_DAY:
@@ -218,6 +221,19 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
         }
 
         return list;
-
     }
+
+    /**
+     * 根据id 按10 取模，并获取最近的 limit 条数
+     *
+     * @param mod
+     * @param snapTime
+     * @param limit
+     * @return
+     */
+    public List<SubQuestionDetail> findListByIdMod(int mod, String snapTime, int limit) {
+        List<SubQuestionDetail> list = subQuestionDetailMapper.findListByIdMod(mod, snapTime, limit);
+        return list;
+    }
+
 }

@@ -12,5 +12,6 @@ public class ProxyEntity {
     private String ip;
     private String port;
     private String plat;
+    private Integer flag;// 对应 分片item id
     private Date createTime;
 }
