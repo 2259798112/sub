@@ -45,11 +45,17 @@ public class ElasticQuestionJob implements SimpleJob {
         log.info("Thread {} , 分片ID {}", Thread.currentThread().getName(), shardingItem);
 
         List<SubQuestionDetail> list = subQuestionDetailService.findListByIdMod(shardingItem, snapTime, limit);
-        if (list==null || list.size() ==0){
+        if (list == null || list.size() == 0) {
             return;
         }
 
-        Proxy proxy = proxyService.getProxy(1, shardingItem);
+        Proxy proxy = null;
+        if (list.size() < 50) {
+            proxy = proxyService.getProxy(1);
+        } else {
+            proxy = proxyService.getProxy(1, shardingItem);
+        }
+
         if (proxy == null) {
             PROXY_COUNT++;
             return;
@@ -66,7 +72,7 @@ public class ElasticQuestionJob implements SimpleJob {
                 if (parse == Const.PROXY_INVALID) {
                     //ip 问题
                     if (PROXY_COUNT > 5) {
-                        proxyService.getProxyAndSaveDB();
+                        proxyService.getProxyAndSaveDB(shardingItem);
                         PROXY_COUNT = 0;
                     } else {
                         PROXY_COUNT++;

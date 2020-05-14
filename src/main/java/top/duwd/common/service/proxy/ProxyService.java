@@ -34,7 +34,9 @@ public class ProxyService {
         example.createCriteria().andBetween("createTime", DateUtil.addMin(date, -minute), date);
         example.setOrderByClause("id desc");
 
-        List<ProxyEntity> list = proxyMapper.selectByExample(example);
+        RowBounds r1 = new RowBounds(0, 1);
+        List<ProxyEntity> list = proxyMapper.selectByExampleAndRowBounds(example,r1);
+
         if (list != null && list.size() > 0) {
             return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(list.get(0).getIp(), Integer.parseInt(list.get(0).getPort())));
         } else {
