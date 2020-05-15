@@ -20,26 +20,18 @@ import java.util.List;
 @RequestMapping("/q")
 @Slf4j
 public class SubQuestionController {
-
     @Resource
     private ApiResultManager apm;
-
     @Resource
     private SubQuestionService subQuestionService;
     @Resource
     private SubQuestionDetailService subQuestionDetailService;
 
-    @GetMapping("/list")
-    public ApiResult listByUserId(@RequestParam(value = "userId") String userId, @RequestParam(value = "type") Integer type, int pageNum, int pageSize) {
-        PageInfo<SubQuestion> list = subQuestionService.listByUserId(userId, type, pageNum, pageSize);
-        return apm.success(list);
-    }
+    /**
+     * 获取用户订阅 话题id list
+     * userId questionType pageNum pageSize
+     */
 
-    @GetMapping("/one")
-    public ApiResult questionDetails(@RequestParam(value = "questionId") Integer questionId, @RequestParam(value = "type") Integer type) {
-        //type 0 hour 最近24, 1 day 最近7天
-        List<SubQuestionDetail> list = subQuestionDetailService.questionDetails(questionId, type);
-        return apm.success(list);
-    }
+
 
 }

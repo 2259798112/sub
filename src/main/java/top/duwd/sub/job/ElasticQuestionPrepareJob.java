@@ -34,20 +34,6 @@ public class ElasticQuestionPrepareJob implements SimpleJob {
     @Autowired
     private SubQuestionDetailService subQuestionDetailService;
 
-    public static String SNAP_TIME = "";
-
-    @Scheduled(cron = "0 30 * * * ?")
-    public void setSnapTime() {
-        setNextHourSnapTime();
-    }
-
-    private void setNextHourSnapTime(){
-        log.info("setNextHourSnapTime");
-        Date date = DateUtil.addMin(new Date(), 60);
-        String snapTime = getSnapTime(date);
-        SNAP_TIME = snapTime;
-    }
-
 
     public static String getSnapTime(Date date) {
         return JSON.toJSONString(date, SerializerFeature.WriteDateUseDateFormat).replace(" ", "-").substring(1, 14);
@@ -79,11 +65,7 @@ public class ElasticQuestionPrepareJob implements SimpleJob {
             return;
         }
 
-        if (StringUtils.isEmpty(SNAP_TIME)){
-            setNextHourSnapTime();
-        }
-
-        List<SubQuestionDetail> details = genListFromQuestionIdList(qidList, new Date(), SNAP_TIME);
+        List<SubQuestionDetail> details = genListFromQuestionIdList(qidList, new Date(), getSnapTime(new Date()));
         int count = subQuestionDetailService.insertList(details, 1000);
         log.info("准备数据，批量插入 {} 次",count);
     }
