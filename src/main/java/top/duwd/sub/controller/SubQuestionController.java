@@ -27,11 +27,61 @@ public class SubQuestionController {
     @Resource
     private SubQuestionDetailService subQuestionDetailService;
 
+    // /q/list?
+
     /**
-     * 获取用户订阅 话题id list
-     * userId questionType pageNum pageSize
+     * 获取用户订阅 话题列表 list
+     * /q/list
+     *
+     * int questionType
+     * int pageNum
+     * int pageSize
+     *
+     * sort order by id asc
+     *
+     * header token
      */
 
 
+    /**
+     * 获取用户订阅 话题id chart
+     * /q/chart
+     *
+     * int qid
+     * String type hour日 day天
+     * Date start
+     * Date end
+     *
+     * header token
+     */
+
+
+    /**
+     * 获取用户订阅 话题id details
+     * /q/details
+     *
+     * int qid
+     * int pageNum
+     * int pageSize
+     *
+     * header token
+     */
+
+
+    /**
+     * 订阅
+     * /q/sub
+     * qid=123456 int
+     *
+     * header token
+     */
+
+    /**
+     * 取消订阅
+     * /q/unsub
+     * qid=123456 int
+     *
+     * header token
+     */
 
 }
