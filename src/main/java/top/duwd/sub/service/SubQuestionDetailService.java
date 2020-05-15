@@ -157,10 +157,7 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
                     BeanUtils.copyProperties(entity, subQuestionDetailEntity);
                     subQuestionDetailEntity.setQuestionId(entity.getId());
 
-                    if (StringUtils.isEmpty(ElasticQuestionPrepareJob.SNAP_TIME)) {
-                        ElasticQuestionPrepareJob.SNAP_TIME = ElasticQuestionPrepareJob.getSnapTime(new Date());
-                    }
-                    subQuestionDetailEntity.setSnapTime(ElasticQuestionPrepareJob.SNAP_TIME);
+                    subQuestionDetailEntity.setSnapTime(ElasticQuestionPrepareJob.getSnapTime(new Date()));
 
                     try {
                         count += updateAndSave(subQuestionDetailEntity);
