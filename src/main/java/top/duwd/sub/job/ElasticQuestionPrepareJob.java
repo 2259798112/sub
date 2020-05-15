@@ -65,7 +65,7 @@ public class ElasticQuestionPrepareJob implements SimpleJob {
             return;
         }
 
-        List<SubQuestionDetail> details = genListFromQuestionIdList(qidList, new Date(), getSnapTime(new Date()));
+        List<SubQuestionDetail> details = genListFromQuestionIdList(qidList, new Date(), getSnapTime(DateUtil.addMin(new Date(),60)));
         int count = subQuestionDetailService.insertList(details, 1000);
         log.info("准备数据，批量插入 {} 次",count);
     }
