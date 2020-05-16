@@ -1,9 +1,7 @@
 package top.duwd.sub.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import top.duwd.common.annotation.CurrentUser;
 import top.duwd.common.annotation.Ignore;
 import top.duwd.common.domain.sub.entity.SubUser;
@@ -22,26 +20,33 @@ public class SubUserController {
     @Resource
     private ApiResultManager apm;
     @Resource
-    private SubUserService userService;
+    private SubUserService subUserService;
 
-    @GetMapping("/login")
-    public ApiResult login(){
+    /**
+     * 用户登录 根据手机号+密码
+     * @param tel
+     * @param pwd
+     * @return
+     */
+    @PostMapping("/login")
+    public ApiResult login(@RequestParam String tel,@RequestParam String pwd){
 
-        return apm.success("login");
+        String token = subUserService.login(tel, pwd);
+        return apm.success(token);
     }
 
 
-    @GetMapping("/ignore")
-    public ApiResult ignore(){
+    /**
+     * 注册用户  根据手机号+密码
+     * @param tel
+     * @param pwd
+     * @return
+     */
+    @PostMapping("/login/reg")
+    public ApiResult reg(@RequestParam String tel,@RequestParam String pwd){
 
-        return apm.success("ignore");
+        String token = subUserService.reg(tel, pwd);
+        return apm.success(token);
     }
-
-    @GetMapping("/normal")
-    public ApiResult normal(@CurrentUser SubUser user){
-
-        return apm.success(user);
-    }
-
 
 }

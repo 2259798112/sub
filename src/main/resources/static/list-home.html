@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>ECharts</title>
+    <link rel="stylesheet" href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/css/bulma.min.css">
+    <link rel="stylesheet"
+          href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.css">
+    <script src="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+    <style>
+        th {
+            white-space: nowrap;
+        }
+
+        .nw {
+            white-space: nowrap;
+        }
+
+        .message {
+            position: absolute;
+            display: none;
+            left: 120px;
+            bottom: 20px;
+            z-index: 1;
+        }
+
+        #iMsg {
+            position: relative;
+        }
+
+    </style>
+
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar is-transparent is-white has-shadow" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="#">
+            <p><strong>DongZhihu.com</strong></p>
+        </a>
+
+        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false"
+           data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+            <a class="navbar-item">
+                主页
+            </a>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-info">
+                        <strong>注册</strong>
+                    </a>
+                    <a class="button is-light">
+                        登陆
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="section">
+    <div class="container" id="box">
+
+        <div class="tile is-ancestor">
+            <div class="tile is-parent">
+                <article class="tile is-child box">
+                    <p class="title">123,465,789</p>
+                    <p class="subtitle">新增浏览</p>
+                </article>
+            </div>
+            <div class="tile is-parent">
+                <article class="tile is-child box">
+                    <p class="title">123,465,789</p>
+                    <p class="subtitle">新增关注</p>
+                </article>
+            </div>
+            <div class="tile is-parent">
+                <article class="tile is-child box">
+                    <p class="title">123,465,789</p>
+                    <p class="subtitle">新增回答</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+
+    <div class="columns">
+
+        <div class="column">
+            <div class="container" id="iMsg">
+
+                <article class="message ">
+                    <div class="message-header">
+                        <p>确保目标网址正确</p>
+                    </div>
+                    <div class="message-body">
+                        以蓝色部分开始<p><strong><span class="has-text-info">https://www.zhihu.com/question/</span><span
+                            class="has-text-danger">333995687</span>/answer/884829786</strong></p>
+                        <p>1,可以直接复制此类网址</p>
+                        <p>2,可以直接输入话题ID<strong><span class="has-text-danger">333995687</span></strong></p>
+                    </div>
+                </article>
+
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal">
+                        <label class="label">话题ID
+                            <span class="icon has-text-info">
+                              <i class="fa fa-info-circle" id="info"></i>
+                            </span>
+                        </label>
+
+
+                    </div>
+                    <div class="field-body">
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <input class="input is-info" type="text" placeholder="请输入正确的话题ID">
+
+                            </div>
+                        </div>
+                        <div class="field is-grouped">
+                            <p class="control">
+                                <a class="button is-info">
+                                    订阅话题
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="column">
+            <div class="container">
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal">
+                        <label class="label">话题列表</label>
+                    </div>
+                    <div class="field-body">
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <div class="select is-info is-fullwidth">
+                                    <select name="filter" id="iSelect">
+                                        <option value="1" selected>有效</option>
+                                        <option value="0">无效</option>
+                                        <option value="-1">全部</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-grouped">
+                            <p class="control">
+                                <a class="button is-info">
+                                    筛选
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <div class="table-container">
+        <table class="table is-hoverable is-fullwidth" id="iTable">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th class="nw">话题ID</th>
+                <th class="nw">标题</th>
+                <th class="nw">有效/无效</th>
+                <th class="nw">添加时间</th>
+                <th class="nw">操作</th>
+            </tr>
+            </thead>
+
+            <tbody id="iTableBody">
+
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="container">
+        <p class="buttons is-centered">
+            <button class="button page page-left">
+                <span class="icon is-small">
+                  <i class="fa fa-angle-double-left"></i>
+                </span>
+            </button>
+            <button class="button page page-left">
+                <span class="icon is-small">
+                  <i class="fa fa-angle-left"></i>
+                </span>
+            </button>
+            <button class="button page page-right">
+                <span class="icon is-small">
+                  <i class="fa fa-angle-right"></i>
+                </span>
+            </button>
+            <button class="button page page-right">
+                <span class="icon is-small">
+                  <i class="fa fa-angle-double-right"></i>
+                </span>
+            </button>
+        </p>
+    </div>
+
+</section>
+
+
+<script type="text/javascript">
+
+    $("#info").hover(function () {
+        $(".message").css("display", "block");
+    }, function () {
+        $(".message").css("display", "none");
+    });
+
+    function subAdd() {
+
+    }
+
+    function subDel() {
+
+    }
+
+
+    const ASC = 0;
+    const DESC = 1;
+    const VALID_SUB = 1;
+    const VALID_SUB_VALUE = '有效';
+
+    const INVALID_SUB = 0;
+    const INVALID_SUB_VALUE = '无效';
+    const BASE_URL = 'http://127.0.0.1:9001';
+    const BASE_ZHIHU_URL = 'https://www.zhihu.com/question/';
+
+    function subList(pageNum, pageSize) {
+
+        let url = "/q/sub/list";
+        let questionType = $("#iSelect option:selected").val();
+        let sort = 'id';
+        let direct = DESC;
+
+        //token: "7b0223c79643475ef9febcfd996c40b2"
+        let token = localStorage.getItem("token");
+
+        $.ajax({
+            url: BASE_URL + url,
+            type: "get", //send it through get method
+            data: {
+                questionType: questionType,
+                pageNum: pageNum,
+                pageSize: pageSize,
+                sort: sort,
+                direct: direct
+            },
+            headers: {token: token},
+            success: function (responseBody) {
+                // alert(JSON.stringify(responseBody))
+                let body = JSON.parse(JSON.stringify(responseBody));
+                if (body.code === 0) {
+                    let array = body.data.list;
+                    renderTable(array);
+                    renderPage(body.data);
+                } else {
+                    console.error("异常结果:" + JSON.stringify(responseBody));
+                }
+
+            },
+            error: function (data) {
+                console.error(JSON.stringify(data))
+            }
+        });
+
+    }
+
+    function renderTable(array) {
+        $("#iTableBody").empty();
+        array.forEach((item, index) => {
+            // alert(index)
+            let tr = document.createElement('tr');
+            $("<th></th>").addClass('nw').text(index + 1).appendTo(tr);
+
+            let th_id = $("<th></th>").addClass('nw').addClass('qid');
+            $(th_id).appendTo(tr);
+            $("<a></a>").attr("href", BASE_ZHIHU_URL + item.questionId).attr("target", "_black").text(item.questionId).appendTo(th_id);
+
+            let title = item.questionTitle.length > 20 ? sub(item.questionTitle, 20) : item.questionTitle;
+            $("<th></th>").addClass('nw').text(title).appendTo(tr);
+
+            $("<th></th>").addClass('nw').text(item.valid === VALID_SUB ? VALID_SUB_VALUE : INVALID_SUB_VALUE).appendTo(tr);
+            $("<th></th>").addClass('nw').text(item.createTime).appendTo(tr);
+            $('<th><div class="field is-grouped"><p class="control"><a class="button is-small is-info q-chart" >详情</a></p><p class="control"><a class="button is-small q-unSub">关闭</a></p></div></th>').addClass('nw').appendTo(tr);
+            $("#iTableBody").append(tr);
+        })
+
+        $('.q-chart').click(function (e) {
+            let btn = e.currentTarget;
+            let qid = $(btn).parent().parent().parent().parent().find(".qid").text();
+            window.open(BASE_ZHIHU_URL+qid, "_blank");
+        })
+    }
+
+    function renderPage(data) {
+        $(".fa-angle-double-left").attr("pageNum", 1);
+        $(".fa-angle-double-right").attr("pageNum", data.pages);
+
+        if (data.isFirstPage) {
+            $(".page-left").attr("Disabled", true);
+            $(".fa-angle-left").attr("pageNum", 1);
+        } else {
+            $(".page-left").attr("Disabled", false);
+            $(".fa-angle-left").attr("pageNum", data.prePage);
+        }
+
+        if (data.isLastPage) {
+            $(".page-right").attr("Disabled", true);
+            $(".fa-angle-right").attr("pageNum", data.pages);
+        } else {
+            $(".page-right").attr("Disabled", false);
+            $(".fa-angle-right").attr("pageNum", data.nextPage);
+        }
+
+
+    }
+
+    function sub(str, n) {
+        let r = /[^\x00-\xff]/g;
+        if (str.replace(r, "mm").length <= n) {
+            return str;
+        }
+        let m = Math.floor(n / 2);
+        for (let i = m; i < str.length; i++) {
+            if (str.substr(0, i).replace(r, "mm").length >= 2 * n) {
+                return str.substr(0, i) + "...";
+            }
+        }
+        return str;
+    }
+
+    $(document).ready(function () {
+
+        //1,获取订阅列表
+        localStorage.setItem("token","7b0223c79643475ef9febcfd996c40b2");
+        console.log(localStorage.getItem("token"));
+
+        subList(1, 10);
+    });
+
+    // 点击事件绑定
+    $('.page').click(function (e) {
+        let btn = e.currentTarget;
+        let pageNum = $(btn).find('i').attr("pageNum");
+        subList(pageNum, 10);
+    });
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js -->
+    <script src="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/echarts/echarts.js"></script>
+    <script src="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/echarts/shine.js"></script>
+    
+	<link rel="stylesheet" href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/css/bulma.min.css">
+	<link rel="stylesheet" href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.css">
+	<script src="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<style>
+th{ 
+white-space:nowrap;
+}
+
+.nw{
+white-space:nowrap;
+}
+</style>
+</head>
+<body>
+<nav class="navbar is-transparent is-white has-shadow" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="#">
+            <p><strong>DongZhihu.com</strong></p>
+        </a>
+
+        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false"
+           data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+            <a class="navbar-item">
+                主页
+            </a>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-info">
+                        <strong>注册</strong>
+                    </a>
+                    <a class="button is-light">
+                        登陆
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+<section class="section">
+    <div class="container">
+        <div id="main" style="width: 100%;height:600px;"></div>
+    </div>
+</section>
+<div class="is-divider" data-content="详细数据"></div>
+<section class="section">
+    <div class="table-container">
+
+        <table class="table is-hoverable is-fullwidth">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>话题ID</th>
+                <th>浏览量</th>
+                <th>关注数</th>
+                <th>答案数</th>
+                <th>话题评论</th>
+                <th>话题赞同</th>
+                <th>时间</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr>
+                <th>1</th>
+                <td><a href="https://www.zhihu.com/question/35032854">35032854</a></td>
+                <td><strong>12769954</strong></td>
+                <td><strong>1276</strong></td>
+                <td><strong>1276</strong></td>
+                <td>128</td>
+                <td>42</td>
+                <td class="nw">2020-5-11 00:09:47</td>
+            </tr>
+
+            <tr>
+                <th>1</th>
+                <td><a href="https://www.zhihu.com/question/35032854">35032854</a></td>
+                <td><strong>12769954</strong></td>
+                <td><strong>1276</strong></td>
+                <td><strong>1276</strong></td>
+                <td>128</td>
+                <td>42</td>
+                <td class="nw">2020-5-11 00:09:47</td>
+            </tr>
+
+            <tr>
+                <th>1</th>
+                <td><a href="https://www.zhihu.com/question/35032854">35032854</a></td>
+                <td><strong>12769954</strong></td>
+                <td><strong>1276</strong></td>
+                <td><strong>1276</strong></td>
+                <td>128</td>
+                <td>42</td>
+                <td>2020-5-11 00:09:47</td>
+            </tr>
+
+            <tr>
+                <th>1</th>
+                <td><a href="https://www.zhihu.com/question/35032854">35032854</a></td>
+                <td><strong>12769954</strong></td>
+                <td><strong>1276</strong></td>
+                <td><strong>1276</strong></td>
+                <td>128</td>
+                <td>42</td>
+                <td>2020-5-11 00:09:47</td>
+            </tr>
+
+            <tr>
+                <th>1</th>
+                <td><a href="https://www.zhihu.com/question/35032854">35032854</a></td>
+                <td><strong>12769954</strong></td>
+                <td><strong>1276</strong></td>
+                <td><strong>1276</strong></td>
+                <td>128</td>
+                <td>42</td>
+                <td>2020-5-11 00:09:47</td>
+            </tr>
+
+
+            </tbody>
+        </table>
+    </div>
+
+<nav class="pagination is-rounded" role="navigation" aria-label="pagination">
+  <a class="pagination-previous">Previous</a>
+  <a class="pagination-next">Next page</a>
+  <ul class="pagination-list">
+    <li><a class="pagination-link" aria-label="Goto page 1">1</a></li>
+    <li><span class="pagination-ellipsis">&hellip;</span></li>
+    <li><a class="pagination-link" aria-label="Goto page 45">45</a></li>
+    <li><a class="pagination-link is-current" aria-label="Page 46" aria-current="page">46</a></li>
+    <li><a class="pagination-link" aria-label="Goto page 47">47</a></li>
+    <li><span class="pagination-ellipsis">&hellip;</span></li>
+    <li><a class="pagination-link" aria-label="Goto page 86">86</a></li>
+  </ul>
+</nav>	
+</section>
+
+
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    let myChart = echarts.init(document.getElementById('main'), 'shine');
+    myChart.showLoading();
+    // 指定图表的配置项和数据
+
+    const BASE_URL = 'http://127.0.0.1:9001';
+    $(document).ready(function () {
+
+        //1,获取订阅列表
+        let strings = location.href.split("/");
+        let qid = strings[strings.length - 1];
+        chartDefault(48040579,1);
+
+    });
+
+
+    function chartDefault(qid, type) {
+        let url = "/q/chart/default";
+
+       //token: "7b0223c79643475ef9febcfd996c40b2"
+        let token = localStorage.getItem("token");
+
+        $.ajax({
+            url: BASE_URL + url,
+            type: "get", //send it through get method
+            data: {
+                qid: qid,
+                type: type
+            },
+            headers: {token: token},
+            success: function (responseBody) {
+                // alert(JSON.stringify(responseBody))
+                let body = JSON.parse(JSON.stringify(responseBody));
+                if (body.code === 0) {
+                    myChart.hideLoading();
+                    myChart.setOption(setOption(body.data));
+                } else {
+                    console.error("异常结果:" + JSON.stringify(responseBody));
+                }
+
+            },
+            error: function (data) {
+                console.error(JSON.stringify(data))
+            }
+        });
+
+
+    }
+
+    function setOption(data) {
+        let head = data[0];
+        let row = data[1];
+
+        let Visit = head[0];
+        let VisitAdd = head[1];
+        let Follower = head[2];
+        let FollowerAdd = head[3];
+        let Answer = head[4];
+        let AnswerAdd = head[5];
+        let SnapTime = head[6];
+        let title = row[row.length -1];
+
+        let option = {
+            title: {
+                text: title
+            },
+            dataZoom: [
+                {
+                    id: 'dataZoomOut',
+                    type: 'slider',
+                    xAxisIndex: [0],
+                    filterMode: 'filter',
+                    start: 0,
+                    end: 30
+                },
+                {
+                    id: 'dataZoomIn',
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    filterMode: 'filter',
+                    start: 0,
+                    end: 30
+                }
+            ],
+
+            //backgroundColor: "#fff",
+            color: ["#1647E9", "#5191FD", "#CC4A30", "#F6A615", "#E82A37", "#F35E4C"],
+
+            dataset: {
+                source: data
+            },
+
+            tooltip: {},
+            legend: {
+
+                top: '10%',
+                pageIconSize: 20,
+
+                data: [Visit, VisitAdd, Follower, FollowerAdd, Answer, AnswerAdd],
+
+                selected: {},
+                itemWidth: 20,
+                textStyle: {fontSize: 14},
+                type: 'scroll'
+
+            },
+            grid: {
+                top: '25%'
+            },
+            xAxis: {
+                type: 'category',
+                inverse: true
+            },
+            yAxis: [{
+                name: '总量',
+                type: 'value',
+                position: 'left',
+                scale: true
+            }, {
+                name: '增量',
+                type: 'value',
+                position: 'right'
+            }],
+
+            series: [{
+                type: 'line',
+                yAxisIndex: 0,
+                symbol: 'emptyCircle',
+                symbolSize: 10,
+                name: Visit,
+                encode: {
+                    x: SnapTime,      // 表示维度 3、1、5 映射到 x 轴。
+                    y: [Visit],              // 表示维度 2 映射到 y 轴。
+                    tooltip: [SnapTime, Visit]
+                }
+            }, {
+                type: 'bar',
+                yAxisIndex: 1,
+                symbol: 'roundRect',
+                name: VisitAdd,
+                encode: {
+                    x: SnapTime,      // 表示维度 3、1、5 映射到 x 轴。
+                    y: VisitAdd,              // 表示维度 2 映射到 y 轴。
+                    tooltip: [SnapTime, VisitAdd]
+                }
+            }, {
+                type: 'line',
+                yAxisIndex: 0,
+                symbol: 'emptyCircle',
+                symbolSize: 10,
+                name: Follower,
+                encode: {
+                    x: SnapTime,      // 表示维度 3、1、5 映射到 x 轴。
+                    y: Follower,              // 表示维度 2 映射到 y 轴。
+                    tooltip: [SnapTime, Follower]
+                }
+            }, {
+                type: 'bar',
+                yAxisIndex: 1,
+                symbol: 'roundRect',
+                name: FollowerAdd,
+                encode: {
+                    x: SnapTime,      // 表示维度 3、1、5 映射到 x 轴。
+                    y: FollowerAdd,              // 表示维度 2 映射到 y 轴。
+                    tooltip: [SnapTime, FollowerAdd]
+                }
+            }, {
+                type: 'line',
+                yAxisIndex: 0,
+                symbol: 'emptyCircle',
+                symbolSize: 10,
+                name: Answer,
+                encode: {
+                    x: SnapTime,      // 表示维度 3、1、5 映射到 x 轴。
+                    y: Answer,              // 表示维度 2 映射到 y 轴。
+                    tooltip: [SnapTime, Answer]
+                }
+            }, {
+                type: 'bar',
+                yAxisIndex: 1,
+                symbol: 'roundRect',
+                name: AnswerAdd,
+                encode: {
+                    x: SnapTime,      // 表示维度 3、1、5 映射到 x 轴。
+                    y: [AnswerAdd],              // 表示维度 2 映射到 y 轴。
+                    tooltip: [SnapTime, AnswerAdd]
+                }
+            }]
+        };
+
+        let object = new Object();
+        object[Visit] = true;
+        object[VisitAdd] = true;
+        object[Follower] = false;
+        object[FollowerAdd] = false;
+        object[Answer] = false;
+        object[AnswerAdd] = false;
+        option.legend.selected=object;
+
+        return option;
+    }
+
+</script>
+</body>
+</html>

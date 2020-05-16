@@ -2,8 +2,9 @@ package top.duwd.sub.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.pagehelper.PageHelper;
-import lombok.Data;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,11 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Example;
 import top.duwd.common.config.Const;
+import top.duwd.common.domain.sub.entity.SubQuestion;
 import top.duwd.common.domain.sub.entity.SubQuestionDetail;
 import top.duwd.common.domain.zhihu.ZhihuQuestionEntity;
 import top.duwd.common.mapper.sub.SubQuestionDetailMapper;
 import top.duwd.common.service.proxy.ProxyService;
 import top.duwd.common.util.CollectionUtil;
+import top.duwd.dutil.date.DateUtil;
 import top.duwd.dutil.http.RequestBuilder;
 import top.duwd.sub.job.ElasticQuestionPrepareJob;
 
@@ -26,6 +29,8 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -63,6 +68,23 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
         map.forEach((key, value) -> criteria.andEqualTo(key, value));
         List<SubQuestionDetail> list = subQuestionDetailMapper.selectByExample(example);
         return list;
+    }
+
+    public PageInfo<SubQuestionDetail> findListByMapPage(Map<String, Object> map, int pageNum, int pageSize, String sortField, int direct) {
+        Example example = new Example(SubQuestionDetail.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andIsNotNull("title");//排除未处理
+        map.forEach((key, value) -> criteria.andEqualTo(key, value));
+        if (Const.ASC == direct) {
+            example.orderBy(sortField).asc();
+        } else {
+            example.orderBy(sortField).desc();
+        }
+
+        PageHelper.startPage(pageNum, pageSize);
+        List<SubQuestionDetail> list = subQuestionDetailMapper.selectByExample(example);
+        PageInfo page = new PageInfo(list);
+        return page;
     }
 
     @Transactional
@@ -198,28 +220,6 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
         }
     }
 
-    public List<SubQuestionDetail> findLastN(String snapTime, int limit) {
-        List<SubQuestionDetail> list = subQuestionDetailMapper.findLastN(snapTime, limit);
-        return list;
-    }
-
-
-    public List<SubQuestionDetail> questionDetails(Integer questionId, Integer type) {
-        List<SubQuestionDetail> list = null;
-        switch (type) {
-            case Const.TYPE_HOUR:
-                PageHelper.startPage(1, 24);
-                list = subQuestionDetailMapper.findListByQuestionId(questionId);
-                break;
-            case Const.TYPE_DAY:
-                break;
-            default:
-                break;
-        }
-
-        return list;
-    }
-
     /**
      * 根据id 按10 取模，并获取最近的 limit 条数
      *
@@ -232,5 +232,107 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
         List<SubQuestionDetail> list = subQuestionDetailMapper.findListByIdMod(mod, snapTime, limit);
         return list;
     }
+
+    /**
+     * 获取图形  dataset
+     * <p>
+     * 第一版 值获取最近24个
+     *
+     * @param qid
+     * @param type
+     */
+    public void chart(int qid, String type, Date start, Date end) {
+        Example example = new Example(SubQuestionDetail.class);
+        example.createCriteria().andEqualTo("questionId", qid);
+        example.orderBy("id").desc();
+    }
+
+    /**
+     * 默认 图形为24个
+     *
+     * @param qid
+     * @param type
+     */
+    public List<List<Object>> chartDefault(int qid, int type) {
+        ArrayList<String> snapTimeList = new ArrayList<>();
+        Date now = new Date();
+        if (Const.TYPE_HOUR == type) {
+            for (int i = 0; i <= 24; i++) {
+                snapTimeList.add(ElasticQuestionPrepareJob.getSnapTime(DateUtil.addMin(now, -60 * i)));
+            }
+        } else if (Const.TYPE_DAY == type) {
+            for (int i = 0; i <= 7; i++) {
+                snapTimeList.add(ElasticQuestionPrepareJob.getSnapTime(DateUtil.addMin(now, -60 * 24 * i)));
+            }
+        } else {
+            for (int i = 0; i <= 24; i++) {
+                snapTimeList.add(ElasticQuestionPrepareJob.getSnapTime(DateUtil.addMin(now, -60 * i)));
+            }
+        }
+
+        log.debug("snapTimeList=[{}]", JSON.toJSONString(snapTimeList));
+        Example example = new Example(SubQuestionDetail.class);
+        example.createCriteria().andEqualTo("questionId", qid).andIn("snapTime", snapTimeList);
+        example.orderBy("id").desc();
+        List<SubQuestionDetail> list = subQuestionDetailMapper.selectByExample(example);
+        List<List<Object>> dataSet = null;
+
+        dataSet = genDataSet(list);
+
+        return dataSet;
+    }
+
+    List<List<Object>> genDataSet(List<SubQuestionDetail> list) {
+        //["Visit", "VisitAdd", "Follower", "FollowerAdd", "Answer", "AnswerAdd", "SnapTime", "Title"]
+        ArrayList<Integer> Visit = new ArrayList<>();
+        ArrayList<Integer> VisitAdd = new ArrayList<>();
+        ArrayList<Integer> Follower = new ArrayList<>();
+        ArrayList<Integer> FollowerAdd = new ArrayList<>();
+        ArrayList<Integer> Answer = new ArrayList<>();
+        ArrayList<Integer> AnswerAdd = new ArrayList<>();
+        ArrayList<Date> SnapTime = new ArrayList<>();
+        ArrayList<String> Title = new ArrayList<>();
+
+        int size = list.size() - 1;//有效数量
+        for (int i = 0; i < size; i++) {
+            SubQuestionDetail q = list.get(i);
+            SubQuestionDetail qNext = list.get(i + 1);
+            Visit.add(q.getVisitCount());
+            VisitAdd.add(q.getVisitCount() - qNext.getVisitCount());
+
+            Follower.add(q.getFollowerCount());
+            FollowerAdd.add(q.getFollowerCount() - qNext.getFollowerCount());
+
+            Answer.add(q.getAnswerCount());
+            AnswerAdd.add(q.getAnswerCount() - qNext.getAnswerCount());
+
+            SnapTime.add(DateUtil.getDateFromStringPattern(q.getSnapTime(), "yyyy-MM-dd-hh"));
+            Title.add(q.getTitle());
+        }
+
+        ArrayList<List<Object>> dataSet = new ArrayList<>(size + 1);
+        String[] names = {"浏览总数", "浏览增量", "话题关注人数", "话题关注增量", "回答总数", "回答增量", "时间", "标题"};
+        List<Object> strings = Arrays.asList(names);
+        dataSet.add(strings);
+
+        for (int i = 0; i < size; i++) {
+            ArrayList<Object> row = new ArrayList<>();
+            row.add(Visit.get(i));
+            row.add(VisitAdd.get(i));
+            row.add(Follower.get(i));
+            row.add(FollowerAdd.get(i));
+            row.add(Answer.get(i));
+            row.add(AnswerAdd.get(i));
+            row.add(SnapTime.get(i));
+            row.add(Title.get(i));
+            dataSet.add(row);
+        }
+
+        log.debug("生成DataSet");
+        log.debug(JSON.toJSONString(dataSet, SerializerFeature.PrettyFormat));
+        return dataSet;
+
+    }
+
 
 }
