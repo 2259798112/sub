@@ -1,14 +1,11 @@
 package top.duwd.sub.controller;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import top.duwd.common.annotation.CurrentUser;
-import top.duwd.common.annotation.Ignore;
 import top.duwd.common.domain.sub.entity.SubUser;
 import top.duwd.dutil.http.api.ApiResult;
 import top.duwd.dutil.http.api.ApiResultManager;
-import top.duwd.sub.service.SubQuestionDetailService;
-import top.duwd.sub.service.SubQuestionService;
 import top.duwd.sub.service.SubUserService;
 
 import javax.annotation.Resource;
@@ -28,6 +25,7 @@ public class SubUserController {
      */
     @PostMapping("/login")
     public ApiResult login(@RequestBody SubUser subUser){
+        log.info("/user/login [user={}]", JSON.toJSONString(subUser));
         String token = subUserService.login(subUser.getTel(), subUser.getPassword());
         return apm.success(token);
     }
@@ -39,6 +37,7 @@ public class SubUserController {
      */
     @PostMapping("/login/reg")
     public ApiResult reg(@RequestParam String tel,@RequestParam String pwd){
+        log.info("/user/login/reg [tel={} pwd={}]", tel,pwd);
         String token = subUserService.reg(tel, pwd);
         return apm.success(token);
     }

@@ -32,7 +32,7 @@ public class ElasticQuestionJob implements SimpleJob {
         String snapTime = ElasticQuestionPrepareJob.getSnapTime(new Date());
 
         int shardingItem = shardingContext.getShardingItem();
-        log.info("Thread {} , 分片ID {}", Thread.currentThread().getName(), shardingItem);
+        log.debug("Thread {} , 分片ID {}", Thread.currentThread().getName(), shardingItem);
 
         List<SubQuestionDetail> list = subQuestionDetailService.findListByIdMod(shardingItem, snapTime, THREAD_LIMIT);
         if (list == null || list.size() == 0) {
