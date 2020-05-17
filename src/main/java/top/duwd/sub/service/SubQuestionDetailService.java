@@ -6,6 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTimeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -305,8 +306,10 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
 
             Answer.add(q.getAnswerCount());
             AnswerAdd.add(q.getAnswerCount() - qNext.getAnswerCount());
+            Date snapDate = DateUtil.getDateFromStringPattern(q.getSnapTime(), "yyyy-MM-dd-HH");
+            log.info("[snapTime={}], [snapDate={}]",q.getSnapTime(),snapDate);
 
-            SnapTime.add(DateUtil.getDateFromStringPattern(q.getSnapTime(), "yyyy-MM-dd-hh"));
+            SnapTime.add(snapDate);
             Title.add(q.getTitle());
         }
 

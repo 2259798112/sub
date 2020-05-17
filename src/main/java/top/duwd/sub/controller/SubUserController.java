@@ -24,27 +24,21 @@ public class SubUserController {
 
     /**
      * 用户登录 根据手机号+密码
-     * @param tel
-     * @param pwd
      * @return
      */
     @PostMapping("/login")
-    public ApiResult login(@RequestParam String tel,@RequestParam String pwd){
-
-        String token = subUserService.login(tel, pwd);
+    public ApiResult login(@RequestBody SubUser subUser){
+        String token = subUserService.login(subUser.getTel(), subUser.getPassword());
         return apm.success(token);
     }
 
 
     /**
      * 注册用户  根据手机号+密码
-     * @param tel
-     * @param pwd
      * @return
      */
     @PostMapping("/login/reg")
     public ApiResult reg(@RequestParam String tel,@RequestParam String pwd){
-
         String token = subUserService.reg(tel, pwd);
         return apm.success(token);
     }
