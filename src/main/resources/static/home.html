@@ -266,9 +266,7 @@
         let sort = 'id';
         let direct = DESC;
 
-        //token: "7b0223c79643475ef9febcfd996c40b2"
         let token = localStorage.getItem("token");
-        console.log("token" + token);
 
         $.ajax({
             url: BASE_URL + url,
@@ -323,7 +321,7 @@
         $('.q-chart').click(function (e) {
             let btn = e.currentTarget;
             let qid = $(btn).parent().parent().parent().parent().find(".qid").text();
-            window.open(BASE_ZHIHU_URL+qid, "_blank");
+            window.open("/chart.html?qid=" + qid, "_blank");
         })
     }
 
@@ -365,7 +363,7 @@
     }
 
     $(document).ready(function () {
-        subList(1,10)
+        subList(1, 10)
         //1,获取订阅列表
     });
 
@@ -375,7 +373,6 @@
         let pageNum = $(btn).find('i').attr("pageNum");
         subList(pageNum, 10);
     });
-
 
 
 </script>

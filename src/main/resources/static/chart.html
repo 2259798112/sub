@@ -7,21 +7,22 @@
     <!-- 引入 echarts.js -->
     <script src="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/echarts/echarts.js"></script>
     <script src="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/echarts/shine.js"></script>
-    
-	<link rel="stylesheet" href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/css/bulma.min.css">
-	<link rel="stylesheet" href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.css">
-	<script src="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.js"></script>
+
+    <link rel="stylesheet" href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/css/bulma.min.css">
+    <link rel="stylesheet"
+          href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.css">
+    <script src="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-<style>
-th{ 
-white-space:nowrap;
-}
+    <style>
+        th {
+            white-space: nowrap;
+        }
 
-.nw{
-white-space:nowrap;
-}
-</style>
+        .nw {
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar is-transparent is-white has-shadow" role="navigation" aria-label="main navigation">
@@ -75,6 +76,7 @@ white-space:nowrap;
             <tr>
                 <th>#</th>
                 <th>话题ID</th>
+                <th>浏览/回答</th>
                 <th>浏览量</th>
                 <th>关注数</th>
                 <th>答案数</th>
@@ -121,19 +123,14 @@ white-space:nowrap;
 </html>
 
 
-
-
-
-
-
-
 <script type="text/javascript">
+
+
     // 基于准备好的dom，初始化echarts实例
     let myChart = echarts.init(document.getElementById('main'), 'shine');
     myChart.showLoading();
     // 指定图表的配置项和数据
 
-    const QUESTION_ID = 48040579;
     const ASC = 0;
     const DESC = 1;
     const VALID_SUB = 1;
@@ -145,24 +142,14 @@ white-space:nowrap;
     const BASE_URL = 'https://dongzhihu.com/';
     const BASE_ZHIHU_URL = 'https://www.zhihu.com/question/';
 
-    $(document).ready(function () {
-
-        //1,获取订阅列表
-        let strings = location.href.split("/");
-        let qid = strings[strings.length - 1];
-        chartDefault(QUESTION_ID,1);
-        detailList(QUESTION_ID,1, 10,'id',DESC);
-    });
 
 
     function chartDefault(qid, type) {
         let url = "/q/chart/default";
-
-        //token: "7b0223c79643475ef9febcfd996c40b2"
         let token = localStorage.getItem("token");
 
         $.ajax({
-            url: BASE_URL + url,
+            url: url,
             type: "get", //send it through get method
             data: {
                 qid: qid,
@@ -170,15 +157,13 @@ white-space:nowrap;
             },
             headers: {token: token},
             success: function (responseBody) {
-                // alert(JSON.stringify(responseBody))
                 let body = JSON.parse(JSON.stringify(responseBody));
                 if (body.code === 0) {
                     myChart.hideLoading();
                     myChart.setOption(setOption(body.data));
                 } else {
-                    console.error("异常结果:" + JSON.stringify(responseBody));
+                    console.alert("异常结果:" + JSON.stringify(responseBody));
                 }
-
             },
             error: function (data) {
                 console.error(JSON.stringify(data))
@@ -199,7 +184,7 @@ white-space:nowrap;
         let Answer = head[4];
         let AnswerAdd = head[5];
         let SnapTime = head[6];
-        let title = row[row.length -1];
+        let title = row[row.length - 1];
 
         let option = {
             title: {
@@ -336,34 +321,18 @@ white-space:nowrap;
         object[FollowerAdd] = false;
         object[Answer] = false;
         object[AnswerAdd] = false;
-        option.legend.selected=object;
+        option.legend.selected = object;
 
         return option;
     }
 
 
-    /*
-        @GetMapping("/details")
-    public ApiResult qDetails(@RequestParam int qid,
-                            @RequestParam int pageNum, @RequestParam int pageSize,
-                            @RequestParam String sort, @RequestParam int direct) {
-
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("questionId", qid);
-        PageInfo<SubQuestionDetail> list = subQuestionDetailService.findListByMapPage(map, pageNum, pageSize, sort, direct);
-        return apm.success(list);
-    }
-     */
-
-
-
-    function detailList(qid,pageNum,pageSize,sort,direct){
+    function detailList(qid, pageNum, pageSize, sort, direct) {
         let url = "/q/details";
-        //token: "7b0223c79643475ef9febcfd996c40b2"
         let token = localStorage.getItem("token");
 
         $.ajax({
-            url: BASE_URL + url,
+            url: url,
             type: "get", //send it through get method
             data: {
                 qid: qid,
@@ -403,12 +372,20 @@ white-space:nowrap;
             $(th_id).appendTo(tr);
             $("<a></a>").attr("href", BASE_ZHIHU_URL + item.questionId).attr("target", "_black").text(item.questionId).appendTo(th_id);
 
-            let th_visit = $("<th></th>").addClass('nw').text(item.visitCount).appendTo(tr);
-            let th_follower_count = $("<th></th>").addClass('nw').text(item.followerCount).appendTo(tr);
-            let th_answer_count = $("<th></th>").addClass('nw').text(item.answerCount).appendTo(tr);
-            let th_comment_count = $("<th></th>").addClass('nw').text(item.commentCount).appendTo(tr);
-            let th_voteup_count = $("<th></th>").addClass('nw').text(item.voteupCount).appendTo(tr);
-            let th_update_time = $("<th></th>").addClass('nw').text(item.updateTime).appendTo(tr);
+            if (item.answerCount > 0){
+                $("<th></th>").addClass('nw').addClass('has-text-danger').text(Math.ceil(item.visitCount/item.answerCount)).appendTo(tr);
+            }else {
+                $("<th></th>").addClass('nw').addClass('has-text-danger').text(item.visitCount).appendTo(tr);
+            }
+
+            $("<th></th>").addClass('nw').text(item.visitCount).appendTo(tr);
+            $("<th></th>").addClass('nw').text(item.followerCount).appendTo(tr);
+            $("<th></th>").addClass('nw').text(item.answerCount).appendTo(tr);
+            $("<th></th>").addClass('nw').text(item.commentCount).appendTo(tr);
+            $("<th></th>").addClass('nw').text(item.voteupCount).appendTo(tr);
+            $("<th></th>").addClass('nw').text(item.updateTime).appendTo(tr);
+
+
 
             $("#iTableBody").append(tr);
         });
@@ -440,7 +417,17 @@ white-space:nowrap;
     $('.page').click(function (e) {
         let btn = e.currentTarget;
         let pageNum = $(btn).find('i').attr("pageNum");
-        detailList(QUESTION_ID,pageNum, 10,'id',DESC);
+        detailList(QUESTION_ID, pageNum, 10, 'id', DESC);
+    });
+
+
+    $(document).ready(function () {
+
+        let searchParams = new URLSearchParams(location.search);
+        let qid = searchParams.get("qid");
+
+        chartDefault(qid, 1);
+        detailList(qid, 1, 10, 'id', DESC);
     });
 
 </script>
