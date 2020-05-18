@@ -12,7 +12,7 @@
 	<link rel="stylesheet" href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.css">
 	<script src="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <style>
 th{ 
 white-space:nowrap;
@@ -83,82 +83,48 @@ white-space:nowrap;
                 <th>时间</th>
             </tr>
             </thead>
-
-            <tbody>
-            <tr>
-                <th>1</th>
-                <td><a href="https://www.zhihu.com/question/35032854">35032854</a></td>
-                <td><strong>12769954</strong></td>
-                <td><strong>1276</strong></td>
-                <td><strong>1276</strong></td>
-                <td>128</td>
-                <td>42</td>
-                <td class="nw">2020-5-11 00:09:47</td>
-            </tr>
-
-            <tr>
-                <th>1</th>
-                <td><a href="https://www.zhihu.com/question/35032854">35032854</a></td>
-                <td><strong>12769954</strong></td>
-                <td><strong>1276</strong></td>
-                <td><strong>1276</strong></td>
-                <td>128</td>
-                <td>42</td>
-                <td class="nw">2020-5-11 00:09:47</td>
-            </tr>
-
-            <tr>
-                <th>1</th>
-                <td><a href="https://www.zhihu.com/question/35032854">35032854</a></td>
-                <td><strong>12769954</strong></td>
-                <td><strong>1276</strong></td>
-                <td><strong>1276</strong></td>
-                <td>128</td>
-                <td>42</td>
-                <td>2020-5-11 00:09:47</td>
-            </tr>
-
-            <tr>
-                <th>1</th>
-                <td><a href="https://www.zhihu.com/question/35032854">35032854</a></td>
-                <td><strong>12769954</strong></td>
-                <td><strong>1276</strong></td>
-                <td><strong>1276</strong></td>
-                <td>128</td>
-                <td>42</td>
-                <td>2020-5-11 00:09:47</td>
-            </tr>
-
-            <tr>
-                <th>1</th>
-                <td><a href="https://www.zhihu.com/question/35032854">35032854</a></td>
-                <td><strong>12769954</strong></td>
-                <td><strong>1276</strong></td>
-                <td><strong>1276</strong></td>
-                <td>128</td>
-                <td>42</td>
-                <td>2020-5-11 00:09:47</td>
-            </tr>
-
+            <tbody id="iTableBody">
 
             </tbody>
         </table>
     </div>
 
-<nav class="pagination is-rounded" role="navigation" aria-label="pagination">
-  <a class="pagination-previous">Previous</a>
-  <a class="pagination-next">Next page</a>
-  <ul class="pagination-list">
-    <li><a class="pagination-link" aria-label="Goto page 1">1</a></li>
-    <li><span class="pagination-ellipsis">&hellip;</span></li>
-    <li><a class="pagination-link" aria-label="Goto page 45">45</a></li>
-    <li><a class="pagination-link is-current" aria-label="Page 46" aria-current="page">46</a></li>
-    <li><a class="pagination-link" aria-label="Goto page 47">47</a></li>
-    <li><span class="pagination-ellipsis">&hellip;</span></li>
-    <li><a class="pagination-link" aria-label="Goto page 86">86</a></li>
-  </ul>
-</nav>	
+
+    <div class="container">
+        <p class="buttons is-centered">
+            <button class="button page page-left">
+                <span class="icon is-small">
+                  <i class="fa fa-angle-double-left"></i>
+                </span>
+            </button>
+            <button class="button page page-left">
+                <span class="icon is-small">
+                  <i class="fa fa-angle-left"></i>
+                </span>
+            </button>
+            <button class="button page page-right">
+                <span class="icon is-small">
+                  <i class="fa fa-angle-right"></i>
+                </span>
+            </button>
+            <button class="button page page-right">
+                <span class="icon is-small">
+                  <i class="fa fa-angle-double-right"></i>
+                </span>
+            </button>
+        </p>
+    </div>
 </section>
+
+
+</body>
+</html>
+
+
+
+
+
+
 
 
 <script type="text/javascript">
@@ -167,21 +133,32 @@ white-space:nowrap;
     myChart.showLoading();
     // 指定图表的配置项和数据
 
-    const BASE_URL = 'http://127.0.0.1:9001';
+    const QUESTION_ID = 48040579;
+    const ASC = 0;
+    const DESC = 1;
+    const VALID_SUB = 1;
+    const VALID_SUB_VALUE = '有效';
+
+
+    const INVALID_SUB = 0;
+    const INVALID_SUB_VALUE = '无效';
+    const BASE_URL = 'https://dongzhihu.com/';
+    const BASE_ZHIHU_URL = 'https://www.zhihu.com/question/';
+
     $(document).ready(function () {
 
         //1,获取订阅列表
         let strings = location.href.split("/");
         let qid = strings[strings.length - 1];
-        chartDefault(48040579,1);
-
+        chartDefault(QUESTION_ID,1);
+        detailList(QUESTION_ID,1, 10,'id',DESC);
     });
 
 
     function chartDefault(qid, type) {
         let url = "/q/chart/default";
 
-       //token: "7b0223c79643475ef9febcfd996c40b2"
+        //token: "7b0223c79643475ef9febcfd996c40b2"
         let token = localStorage.getItem("token");
 
         $.ajax({
@@ -295,7 +272,7 @@ white-space:nowrap;
                 encode: {
                     x: SnapTime,      // 表示维度 3、1、5 映射到 x 轴。
                     y: [Visit],              // 表示维度 2 映射到 y 轴。
-                    tooltip: [SnapTime, Visit]
+                    tooltip: [Visit]
                 }
             }, {
                 type: 'bar',
@@ -305,7 +282,7 @@ white-space:nowrap;
                 encode: {
                     x: SnapTime,      // 表示维度 3、1、5 映射到 x 轴。
                     y: VisitAdd,              // 表示维度 2 映射到 y 轴。
-                    tooltip: [SnapTime, VisitAdd]
+                    tooltip: [VisitAdd]
                 }
             }, {
                 type: 'line',
@@ -364,6 +341,106 @@ white-space:nowrap;
         return option;
     }
 
+
+    /*
+        @GetMapping("/details")
+    public ApiResult qDetails(@RequestParam int qid,
+                            @RequestParam int pageNum, @RequestParam int pageSize,
+                            @RequestParam String sort, @RequestParam int direct) {
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("questionId", qid);
+        PageInfo<SubQuestionDetail> list = subQuestionDetailService.findListByMapPage(map, pageNum, pageSize, sort, direct);
+        return apm.success(list);
+    }
+     */
+
+
+
+    function detailList(qid,pageNum,pageSize,sort,direct){
+        let url = "/q/details";
+        //token: "7b0223c79643475ef9febcfd996c40b2"
+        let token = localStorage.getItem("token");
+
+        $.ajax({
+            url: BASE_URL + url,
+            type: "get", //send it through get method
+            data: {
+                qid: qid,
+                pageNum: pageNum,
+                pageSize: pageSize,
+                sort: sort,
+                direct: direct
+            },
+            headers: {token: token},
+            success: function (responseBody) {
+                // alert(JSON.stringify(responseBody))
+                let body = JSON.parse(JSON.stringify(responseBody));
+                if (body.code === 0) {
+                    let array = body.data.list;
+                    renderTable(array);
+                    renderPage(body.data);
+                } else {
+                    console.error("异常结果:" + JSON.stringify(responseBody));
+                }
+
+            },
+            error: function (data) {
+                console.error(JSON.stringify(data))
+            }
+        });
+    }
+
+    //    #	话题ID	浏览量	关注数	答案数	话题评论	话题赞同	时间
+    function renderTable(array) {
+        $("#iTableBody").empty();
+        array.forEach((item, index) => {
+            // alert(index)
+            let tr = document.createElement('tr');
+            $("<th></th>").addClass('nw').text(index + 1).appendTo(tr);
+
+            let th_id = $("<th></th>").addClass('nw').addClass('qid');
+            $(th_id).appendTo(tr);
+            $("<a></a>").attr("href", BASE_ZHIHU_URL + item.questionId).attr("target", "_black").text(item.questionId).appendTo(th_id);
+
+            let th_visit = $("<th></th>").addClass('nw').text(item.visitCount).appendTo(tr);
+            let th_follower_count = $("<th></th>").addClass('nw').text(item.followerCount).appendTo(tr);
+            let th_answer_count = $("<th></th>").addClass('nw').text(item.answerCount).appendTo(tr);
+            let th_comment_count = $("<th></th>").addClass('nw').text(item.commentCount).appendTo(tr);
+            let th_voteup_count = $("<th></th>").addClass('nw').text(item.voteupCount).appendTo(tr);
+            let th_update_time = $("<th></th>").addClass('nw').text(item.updateTime).appendTo(tr);
+
+            $("#iTableBody").append(tr);
+        });
+    }
+
+    function renderPage(data) {
+        $(".fa-angle-double-left").attr("pageNum", 1);
+        $(".fa-angle-double-right").attr("pageNum", data.pages);
+
+        if (data.isFirstPage) {
+            $(".page-left").attr("Disabled", true);
+            $(".fa-angle-left").attr("pageNum", 1);
+        } else {
+            $(".page-left").attr("Disabled", false);
+            $(".fa-angle-left").attr("pageNum", data.prePage);
+        }
+
+        if (data.isLastPage) {
+            $(".page-right").attr("Disabled", true);
+            $(".fa-angle-right").attr("pageNum", data.pages);
+        } else {
+            $(".page-right").attr("Disabled", false);
+            $(".fa-angle-right").attr("pageNum", data.nextPage);
+        }
+    }
+
+
+    // 点击事件绑定
+    $('.page').click(function (e) {
+        let btn = e.currentTarget;
+        let pageNum = $(btn).find('i').attr("pageNum");
+        detailList(QUESTION_ID,pageNum, 10,'id',DESC);
+    });
+
 </script>
-</body>
-</html>

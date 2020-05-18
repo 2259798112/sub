@@ -9,7 +9,7 @@
           href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.css">
     <script src="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/ext/bulma-extensions.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <style>
         th {
             white-space: nowrap;
@@ -33,7 +33,7 @@
 
     </style>
 
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
 </head>
 <body>
 
@@ -256,7 +256,7 @@
 
     const INVALID_SUB = 0;
     const INVALID_SUB_VALUE = '无效';
-    const BASE_URL = 'http://127.0.0.1:9001';
+    const BASE_URL = 'https://dongzhihu.com/';
     const BASE_ZHIHU_URL = 'https://www.zhihu.com/question/';
 
     function subList(pageNum, pageSize) {
@@ -268,6 +268,7 @@
 
         //token: "7b0223c79643475ef9febcfd996c40b2"
         let token = localStorage.getItem("token");
+        console.log("token" + token);
 
         $.ajax({
             url: BASE_URL + url,
@@ -364,12 +365,8 @@
     }
 
     $(document).ready(function () {
-
+        subList(1,10)
         //1,获取订阅列表
-        localStorage.setItem("token","7b0223c79643475ef9febcfd996c40b2");
-        console.log(localStorage.getItem("token"));
-
-        subList(1, 10);
     });
 
     // 点击事件绑定

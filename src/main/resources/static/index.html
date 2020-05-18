@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>懂知乎-DongZhihu.com</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="css/font/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <link rel="stylesheet" href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/css/bulma.min.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <style>
+        .help {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar is-transparent is-white has-shadow" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="#">
+            <p><strong>DongZhihu.com</strong></p>
+        </a>
+    </div>
+</nav>
+
+<div class="limiter">
+    <div class="container-login100">
+        <div class="wrap-login100">
+            <div class="login100-form-title" style="background-image: url(images/login.png);">
+            </div>
+            <div class="login100-form validate-form">
+                <div class="wrap-input100 validate-input m-b-26">
+                    <span class="label-input100">用户名</span>
+                    <input class="input100" type="text" name="username" placeholder="请输入用户名">
+                    <span class="focus-input100"></span>
+                </div>
+                <p class="help is-danger" id="iUsernameHelp">This username is available</p>
+                <div class="wrap-input100 validate-input m-b-18">
+                    <span class="label-input100">密码</span>
+                    <input class="input100" type="password" name="password" placeholder="请输入密码">
+                    <span class="focus-input100"></span>
+                </div>
+                <p class="help is-danger" id="iPasswordHelp">This username is available</p>
+                <div class="container">
+
+                    <div class="field is-grouped is-grouped-right">
+                        <p class="control">
+                            <a class="button is-info" id="iBtnLogin">
+                                登录
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    const BASE_URL = 'http://dongzhihu.com/';
+
+    $("#iBtnLogin").click(function () {
+        let username = $(" input[ name='username' ] ").val()
+        let password = $(" input[ name='password' ] ").val()
+
+        //6到16位（字母，数字，下划线）
+        let uPattern = /^[a-zA-Z0-9_]{6,16}$/;
+        //至少6-16个字符，至少1个大写字母，1个小写字母和1个数字，其他可以是任意字符：
+        let pPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{6,16}$/;
+
+        if (!uPattern.test(username)) {
+            $("#iUsernameHelp").css("display", "block").text("用户名 6到16位 字母，数字，下划线");
+            return;
+        } else {
+            $("#iUsernameHelp").css("display", "none");
+        }
+
+        if (!pPattern.test(password)) {
+            $("#iPasswordHelp").css("display", "block").text("密码 6-16个字符，至少1个大写字母，1个小写字母和1个数字，其他可以是任意字符：");
+            return;
+        } else {
+            $("#iPasswordHelp").css("display", "none");
+        }
+
+        // let url = BASE_URL + "/user/login";
+        let url ="/user/login";
+
+        let obj = new Object();
+        obj.tel = username;
+        obj.password = password;
+
+        $.ajax({
+            url: url,
+            type: "POST", //send it through get method
+            data: JSON.stringify(obj),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (responseBody) {
+                let body = JSON.parse(JSON.stringify(responseBody));
+                if (body.code === 0) {
+                    //登录 成功, 跳转
+                    localStorage.setItem("token",body.data);
+                    window.location.href = "https://dongzhihu.com/home.html"
+                } else {
+                    $("#iUsernameHelp").css("display", "none");
+                    $("#iPasswordHelp").css("display", "block").text(body.msg);
+                }
+            },
+        });
+    })
+
+</script>
+
+</body>
+</html>
