@@ -19,4 +19,6 @@ public class Const {
 
     public static final int ASC = 0;
     public static final int DESC = 1;
+
+    public static final String ChinaZ = "ChinaZ";
 }

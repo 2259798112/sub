@@ -15,6 +15,10 @@
         <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
         <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
 
+        <commentGenerator>
+            <property name="suppressAllComments" value="true" />
+        </commentGenerator>
+
         <jdbcConnection driverClass="${spring.datasource.driverClassName}"
                         connectionURL="${spring.datasource.url}"
                         userId="${spring.datasource.username}"
@@ -32,7 +36,7 @@
                              type="XMLMAPPER"></javaClientGenerator>
 
 
-        <table tableName="t_sub_user" domainObjectName="SubUser"
+        <table tableName="t_keyword" domainObjectName="Keyword"
                enableInsert="false"
                enableSelectByPrimaryKey="true"
                enableDeleteByPrimaryKey="false"

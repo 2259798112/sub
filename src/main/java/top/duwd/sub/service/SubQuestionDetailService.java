@@ -294,6 +294,7 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
         ArrayList<Date> SnapTime = new ArrayList<>();
         ArrayList<String> Title = new ArrayList<>();
 
+
         int size = list.size() - 1;//有效数量
         for (int i = 0; i < size; i++) {
             SubQuestionDetail q = list.get(i);
@@ -306,15 +307,16 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
 
             Answer.add(q.getAnswerCount());
             AnswerAdd.add(q.getAnswerCount() - qNext.getAnswerCount());
-            Date snapDate = DateUtil.getDateFromStringPattern(q.getSnapTime(), "yyyy-MM-dd-HH");
-            log.info("[snapTime={}], [snapDate={}]",q.getSnapTime(),snapDate);
 
+            Date snapDate = DateUtil.getDateFromStringPattern(q.getSnapTime(), "yyyy-MM-dd-HH");
+            log.info("[snapTime={}], [snapDate={}]", q.getSnapTime(), snapDate);
             SnapTime.add(snapDate);
+
             Title.add(q.getTitle());
         }
 
         ArrayList<List<Object>> dataSet = new ArrayList<>(size + 1);
-        String[] names = {"浏览总数", "浏览增量", "话题关注人数", "话题关注增量", "回答总数", "回答增量", "时间", "标题"};
+        String[] names = {"浏览总数", "浏览增量", "话题关注人数", "话题关注增量", "回答总数", "回答增量", "时间", "标题", "浏览回答比"};
         List<Object> strings = Arrays.asList(names);
         dataSet.add(strings);
 
@@ -328,6 +330,8 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
             row.add(AnswerAdd.get(i));
             row.add(SnapTime.get(i));
             row.add(Title.get(i));
+            int VisitAddAnswerAdd = (AnswerAdd.get(i) > 0 ? (VisitAdd.get(i) / AnswerAdd.get(i)) : VisitAdd.get(i));
+            row.add(VisitAddAnswerAdd);
             dataSet.add(row);
         }
 
