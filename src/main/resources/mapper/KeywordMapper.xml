@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="top.duwd.common.mapper.sub.KeywordMapper" >
+  <resultMap id="BaseResultMap" type="top.duwd.common.domain.sub.entity.Keyword" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="keyword_main" property="keywordMain" jdbcType="VARCHAR" />
+    <result column="keyword_tail" property="keywordTail" jdbcType="VARCHAR" />
+    <result column="plat" property="plat" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="counter" property="counter" jdbcType="INTEGER" />
+    <result column="counter_m" property="counterM" jdbcType="INTEGER" />
+  </resultMap>
+<!--  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >-->
+<!--    select id, keyword_main, keyword_tail, plat, create_time, update_time-->
+<!--    from t_keyword-->
+<!--    where id = #{id,jdbcType=INTEGER}-->
+<!--  </select>-->
+<!--  <select id="selectAll" resultMap="BaseResultMap" >-->
+<!--    select id, keyword_main, keyword_tail, plat, create_time, update_time-->
+<!--    from t_keyword-->
+<!--  </select>-->
+
+  <insert id="insertList" parameterType="java.util.List" >
+    insert into t_keyword(id,keyword_main,keyword_tail,plat,create_time,update_time,counter,counter_m) values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.id},#{item.keywordMain},#{item.keywordTail},#{item.plat},#{item.createTime},#{item.updateTime},#{item.counter},#{item.counterM})
+    </foreach>
+  </insert>
+</mapper>
