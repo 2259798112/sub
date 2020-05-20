@@ -3,18 +3,16 @@ package top.duwd.sub.service;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 import top.duwd.common.config.Const;
 import top.duwd.common.domain.sub.entity.Keyword;
 import top.duwd.common.mapper.sub.KeywordMapper;
+import top.duwd.dutil.http.html.Baidu;
 import top.duwd.dutil.http.html.ChinaZ;
+import top.duwd.dutil.http.html.dto.BaiduSearchResult;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -22,19 +20,129 @@ public class KeywordService implements IBaseService<Keyword> {
 
     @Autowired
     private ChinaZ chinaZ;
-
+    @Autowired
+    private Baidu baidu;
     @Autowired
     private KeywordMapper keywordMapper;
 
-    public List<Keyword> findMoreFromChinaZ(String keyword) {
+    /**
+     * 挖掘 关键词
+     *
+     * @param keyword
+     * @return
+     */
 
-        List<Keyword> dbList = findListByKV("keywordMain", keyword);
-        if (dbList != null || dbList.size() > 0) {
-            log.info("[keyword={}]处理过，Pass", keyword);
+    //自己 导入关键词列表
+    public List<Keyword> importKeyword(String keywordMain, List<String> keywordList) {
+
+        if (keywordList != null && keywordList.size() > 0) {
+            ArrayList<Keyword> keywords = new ArrayList<>();
+            Date date = new Date();
+            HashSet<String> set = new HashSet<>(keywordList);
+            for (String keyword : set) {
+                Keyword item = new Keyword();
+                item.setKeywordMain(keywordMain);
+                item.setKeywordTail(keyword);
+                item.setPlat(Const.CUSTOM);
+                item.setCounter(0);
+                item.setCounterM(0);
+                item.setCreateTime(date);
+                item.setUpdateTime(date);
+                keywords.add(item);
+            }
+            //数据库关键词去重
+            return keywords;
+        } else {
             return null;
         }
+    }
 
-        List<String> keywords = chinaZ.keyword(keyword, 1, 5);
+    //从平台 挖掘关键词
+    public List<Keyword> findFromWeb(String keyword, String... plat) {
+        ArrayList<Keyword> keywords = new ArrayList<>();
+
+        for (String p : plat) {
+            if (Const.Baidu.equalsIgnoreCase(p)) {
+                List<Keyword> list = findKeywordListFromBaidu(keyword);
+                if (list != null && list.size() > 0) {
+                    keywords.addAll(list);
+                }
+            }
+
+            if (Const.ChinaZ.equalsIgnoreCase(p)) {
+                List<Keyword> list = findMoreFromChinaZ(keyword);
+                if (list != null && list.size() > 0) {
+                    keywords.addAll(list);
+                }
+            }
+        }
+        return keywords;
+    }
+
+    List<Keyword> findKeywordListFromBaidu(String keyword) {
+        //baidu PC
+        ArrayList<Keyword> keywords = new ArrayList<>();
+        Date date = new Date();
+
+        HashMap<String, String> hMapPC = null;
+        BaiduSearchResult searchPC = baidu.searchPC(hMapPC, keyword, 1, null);
+        if (searchPC != null && searchPC.getRs() != null && searchPC.getRs().size() > 0) {
+            for (String rsKeyword : searchPC.getRs()) {//遍历第一页 相关词
+                serachRSPC(keyword, keywords, date, rsKeyword);
+
+                //迭代一层
+                BaiduSearchResult searchPCChild = baidu.searchPC(hMapPC, rsKeyword, 1, null);
+                if (searchPCChild != null && searchPCChild.getRs() != null && searchPCChild.getRs().size() > 0) {
+                    serachRSPC(keyword, keywords, date, rsKeyword);
+                }
+            }
+        }
+
+        HashMap<String, String> hMapMobile = null;
+        BaiduSearchResult searchM = baidu.searchM(hMapMobile, keyword, 1, null);
+        if (searchM != null && searchM.getRs() != null && searchM.getRs().size() > 0) {
+            for (String rsKeyword : searchM.getRs()) {//遍历第一页 相关词
+                searchRSMobile(keyword, keywords, date, rsKeyword);
+
+                //迭代一层
+                BaiduSearchResult searchMChild = baidu.searchM(hMapMobile, rsKeyword, 1, null);
+                if (searchMChild != null && searchMChild.getRs() != null && searchMChild.getRs().size() > 0) {
+                    searchRSMobile(keyword, keywords, date, rsKeyword);
+                }
+            }
+        }
+
+        return keywords;
+
+    }
+
+    private void searchRSMobile(String keyword, ArrayList<Keyword> keywords, Date date, String rsKeyword) {
+        Keyword pcKeyword = new Keyword();
+        pcKeyword.setPlat(Const.BaiduMo);
+        pcKeyword.setKeywordMain(keyword);
+        pcKeyword.setKeywordTail(rsKeyword);
+        pcKeyword.setCounter(0);
+        pcKeyword.setCounterM(0);
+        pcKeyword.setCreateTime(date);
+        pcKeyword.setUpdateTime(date);
+        keywords.add(pcKeyword);
+    }
+
+    private void serachRSPC(String keyword, ArrayList<Keyword> keywords, Date date, String rsKeyword) {
+        Keyword pcKeyword = new Keyword();
+        pcKeyword.setPlat(Const.BaiduPC);
+        pcKeyword.setKeywordMain(keyword);
+        pcKeyword.setKeywordTail(rsKeyword);
+        pcKeyword.setCounter(0);
+        pcKeyword.setCounterM(0);
+        pcKeyword.setCreateTime(date);
+        pcKeyword.setUpdateTime(date);
+        keywords.add(pcKeyword);
+    }
+
+    public List<Keyword> findMoreFromChinaZ(String keyword) {
+
+        List<String> keywords = chinaZ.keyword(null, keyword, 1, 5);
         if (keywords == null || keywords.size() == 0) {
             return null;
         }
@@ -64,18 +172,6 @@ public class KeywordService implements IBaseService<Keyword> {
         }
         log.info("批量保存 [count={}]", count);
         return count;
-    }
-
-    @Async
-    public void findMoreKeyword(String keyword, String plat) {
-        switch (plat) {
-            case Const.ChinaZ:
-                insertList(findMoreFromChinaZ(keyword));
-                break;
-            default:
-                insertList(findMoreFromChinaZ(keyword));
-                break;
-        }
     }
 
 
