@@ -1,12 +1,16 @@
 package top.duwd.sub.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Example;
 import top.duwd.common.config.Const;
 import top.duwd.common.domain.sub.entity.Keyword;
+import top.duwd.common.domain.sub.entity.KeywordUser;
+import top.duwd.common.domain.sub.entity.SubUser;
 import top.duwd.common.mapper.sub.KeywordMapper;
 import top.duwd.dutil.http.html.Baidu;
 import top.duwd.dutil.http.html.ChinaZ;
@@ -32,7 +36,8 @@ public class KeywordService implements IBaseService<Keyword> {
      * @return
      */
 
-    //自己 导入关键词列表
+
+    //自己 导入关键词列表 已经过滤过的keywordList
     public List<Keyword> importKeyword(String keywordMain, List<String> keywordList) {
 
         if (keywordList != null && keywordList.size() > 0) {
@@ -58,6 +63,7 @@ public class KeywordService implements IBaseService<Keyword> {
     }
 
     //从平台 挖掘关键词
+    /*
     public List<Keyword> findFromWeb(String keyword, String... plat) {
         ArrayList<Keyword> keywords = new ArrayList<>();
 
@@ -79,6 +85,9 @@ public class KeywordService implements IBaseService<Keyword> {
         return keywords;
     }
 
+     */
+
+    //用于定时调度
     List<Keyword> findKeywordListFromBaidu(String keyword) {
         //baidu PC
         ArrayList<Keyword> keywords = new ArrayList<>();
@@ -140,6 +149,7 @@ public class KeywordService implements IBaseService<Keyword> {
         keywords.add(pcKeyword);
     }
 
+    //用于定时调度
     public List<Keyword> findMoreFromChinaZ(String keyword) {
 
         List<String> keywords = chinaZ.keyword(null, keyword, 1, 5);
@@ -188,5 +198,26 @@ public class KeywordService implements IBaseService<Keyword> {
         Example.Criteria criteria = example.createCriteria();
         map.forEach((key, value) -> criteria.andEqualTo(key, value));
         return keywordMapper.selectByExample(example);
+    }
+
+    public void add(SubUser subUser, String keyword, JSONArray platArray, JSONArray importArray) {
+        if (!StringUtils.isEmpty(keyword)){
+            //先保留原始数据
+
+            KeywordUser keywordUser = new KeywordUser();
+            keywordUser.setKeywordMain(keyword);
+            keywordUser.setUserId(subUser.getUserId());
+            if (platArray !=null){
+                keywordUser.setPlat(platArray.toJSONString());
+            }
+            if (importArray !=null){
+                keywordUser.setImportList(importArray.toJSONString());
+            }
+            Date date = new Date();
+            keywordUser.setCreateTime(date);
+            keywordUser.setUpdateTime(date);
+
+
+        }
     }
 }
