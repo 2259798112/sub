@@ -1,17 +1,15 @@
 package top.duwd.sub.service;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Example;
 import top.duwd.common.config.Const;
 import top.duwd.common.domain.sub.entity.Keyword;
-import top.duwd.common.domain.sub.entity.KeywordUser;
-import top.duwd.common.domain.sub.entity.SubUser;
+import top.duwd.common.exception.DuExceptionManager;
 import top.duwd.common.mapper.sub.KeywordMapper;
+import top.duwd.common.mapper.sub.KeywordUserMapper;
 import top.duwd.dutil.http.html.Baidu;
 import top.duwd.dutil.http.html.ChinaZ;
 import top.duwd.dutil.http.html.dto.BaiduSearchResult;
@@ -28,27 +26,52 @@ public class KeywordService implements IBaseService<Keyword> {
     private Baidu baidu;
     @Autowired
     private KeywordMapper keywordMapper;
+    @Autowired
+    private KeywordUserMapper keywordUserMapper;
+    @Autowired
+    private DuExceptionManager em;
+
 
     /**
-     * 挖掘 关键词
+     * 查找 主词 和 列表次
      *
-     * @param keyword
+     * @param keywordMain
+     * @param keywordList
      * @return
      */
+    private List<String> filterCustomImport(String keywordMain, List<String> keywordList) {
+        //过滤 主词和 导入词
 
+        Example example = new Example(Keyword.class);
+        example.createCriteria().andEqualTo("keywordMain", keywordMain)
+                .andEqualTo("plat", Const.KEYWORD_PLAT_CUSTOM)
+                .andIn("keywordTail", keywordList);
+
+        List<Keyword> keywords = keywordMapper.selectByExample(example);
+        if (keywords == null || keywords.size() == 0) {
+            return null;
+        }
+
+        for (Keyword keyword : keywords) {
+            if (keywordList.contains(keyword.getKeywordTail())) {
+                keywordList.remove(keyword.getKeywordTail());
+            }
+        }
+        return keywordList;
+    }
 
     //自己 导入关键词列表 已经过滤过的keywordList
     public List<Keyword> importKeyword(String keywordMain, List<String> keywordList) {
+        List<String> words = this.filterCustomImport(keywordMain, keywordList);
 
-        if (keywordList != null && keywordList.size() > 0) {
+        if (words != null && words.size() > 0) {
             ArrayList<Keyword> keywords = new ArrayList<>();
             Date date = new Date();
-            HashSet<String> set = new HashSet<>(keywordList);
-            for (String keyword : set) {
+            for (String keyword : words) {
                 Keyword item = new Keyword();
                 item.setKeywordMain(keywordMain);
                 item.setKeywordTail(keyword);
-                item.setPlat(Const.CUSTOM);
+                item.setPlat(Const.KEYWORD_PLAT_CUSTOM);
                 item.setCounter(0);
                 item.setCounterM(0);
                 item.setCreateTime(date);
@@ -62,33 +85,9 @@ public class KeywordService implements IBaseService<Keyword> {
         }
     }
 
-    //从平台 挖掘关键词
-    /*
-    public List<Keyword> findFromWeb(String keyword, String... plat) {
-        ArrayList<Keyword> keywords = new ArrayList<>();
-
-        for (String p : plat) {
-            if (Const.Baidu.equalsIgnoreCase(p)) {
-                List<Keyword> list = findKeywordListFromBaidu(keyword);
-                if (list != null && list.size() > 0) {
-                    keywords.addAll(list);
-                }
-            }
-
-            if (Const.ChinaZ.equalsIgnoreCase(p)) {
-                List<Keyword> list = findMoreFromChinaZ(keyword);
-                if (list != null && list.size() > 0) {
-                    keywords.addAll(list);
-                }
-            }
-        }
-        return keywords;
-    }
-
-     */
 
     //用于定时调度
-    List<Keyword> findKeywordListFromBaidu(String keyword) {
+    public List<Keyword> findKeywordListFromBaidu(String keyword) {
         //baidu PC
         ArrayList<Keyword> keywords = new ArrayList<>();
         Date date = new Date();
@@ -163,7 +162,7 @@ public class KeywordService implements IBaseService<Keyword> {
             Keyword entity = new Keyword();
             entity.setKeywordMain(keyword);
             entity.setKeywordTail(word);
-            entity.setPlat(Const.ChinaZ);
+            entity.setPlat(Const.KEYWORD_PLAT_ChinaZ);
             entity.setCreateTime(date);
             entity.setUpdateTime(date);
             entity.setCounter(0);
@@ -184,7 +183,6 @@ public class KeywordService implements IBaseService<Keyword> {
         return count;
     }
 
-
     @Override
     public List<Keyword> findListByKV(String k, Object v) {
         Example example = new Example(Keyword.class);
@@ -200,24 +198,4 @@ public class KeywordService implements IBaseService<Keyword> {
         return keywordMapper.selectByExample(example);
     }
 
-    public void add(SubUser subUser, String keyword, JSONArray platArray, JSONArray importArray) {
-        if (!StringUtils.isEmpty(keyword)){
-            //先保留原始数据
-
-            KeywordUser keywordUser = new KeywordUser();
-            keywordUser.setKeywordMain(keyword);
-            keywordUser.setUserId(subUser.getUserId());
-            if (platArray !=null){
-                keywordUser.setPlat(platArray.toJSONString());
-            }
-            if (importArray !=null){
-                keywordUser.setImportList(importArray.toJSONString());
-            }
-            Date date = new Date();
-            keywordUser.setCreateTime(date);
-            keywordUser.setUpdateTime(date);
-
-
-        }
-    }
 }

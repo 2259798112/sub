@@ -46,6 +46,8 @@ public class ErrorCodes {
     public static final String SUB_QUESTION_NOT_IN_DB_VALUE = "问题不存在";
     public static final int SUB_QUESTION_IS_NOT_A_QUESTION = 70003;
     public static final String SUB_QUESTION_IS_NOT_A_QUESTION_VALUE = "订阅的问题不存在";
+    public static final int KEYWORD_ADD_ERROR = 80001;
+    public static final String KEYWORD_ADD_ERROR_VALUE = "关键词添加异常";
 
 
     static {
@@ -61,6 +63,8 @@ public class ErrorCodes {
         map.put(USER_PASSWORD_LENGTH_TOO_SHORT, USER_PASSWORD_LENGTH_TOO_SHORT_VALUE);
         map.put(USER_PASSWORD_HAS_SPACE, USER_PASSWORD_HAS_SPACE_VALUE);
         map.put(SUB_QUESTION_IS_NOT_A_QUESTION, SUB_QUESTION_IS_NOT_A_QUESTION_VALUE);
+
+        map.put(KEYWORD_ADD_ERROR, KEYWORD_ADD_ERROR_VALUE);
     }
 
 }

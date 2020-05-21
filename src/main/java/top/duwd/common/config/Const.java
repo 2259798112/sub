@@ -20,9 +20,9 @@ public class Const {
     public static final int ASC = 0;
     public static final int DESC = 1;
 
-    public static final String CUSTOM = "custom";
-    public static final String ChinaZ = "ChinaZ";
-    public static final String Baidu = "Baidu";
+    public static final String KEYWORD_PLAT_CUSTOM = "custom";
+    public static final String KEYWORD_PLAT_ChinaZ = "ChinaZ";
+    public static final String KEYWORD_PLAT_Baidu = "Baidu";
     public static final String BaiduPC = "Baidu-PC";
     public static final String BaiduMo = "Baidu-Mobile";
 }

@@ -13,6 +13,7 @@ import top.duwd.common.domain.sub.entity.SubUser;
 import top.duwd.dutil.http.api.ApiResult;
 import top.duwd.dutil.http.api.ApiResultManager;
 import top.duwd.sub.service.KeywordService;
+import top.duwd.sub.service.KeywordUserService;
 
 @RestController
 @Slf4j
@@ -21,6 +22,8 @@ public class KeywordController {
 
     @Autowired
     private KeywordService keywordService;
+    @Autowired
+    private KeywordUserService keywordUserService;
     @Autowired
     private ApiResultManager apm;
 
@@ -40,6 +43,7 @@ public class KeywordController {
         String keyword = jsonObject.getString("keyword");
         JSONArray platArray = jsonObject.getJSONArray("plat");
         JSONArray importArray = jsonObject.getJSONArray("import");
-        keywordService.add(subUser,keyword,platArray,importArray);
+        int add = keywordUserService.add(subUser, keyword, platArray, importArray);
+        return apm.success(add);
     }
 }
