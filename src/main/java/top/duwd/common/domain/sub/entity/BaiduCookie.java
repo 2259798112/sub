@@ -10,21 +10,14 @@ import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@Table(name = "t_keyword")
-public class Keyword implements Serializable {
+@Table(name = "t_baidu_cookie")
+public class BaiduCookie implements Serializable {
     @Id
     private Integer id;
-    private Integer counter;
-    private Integer counterM;
-
-    private String keywordMain;
-
-    private String keywordTail;
-
-    private String plat;
 
     private Date createTime;
 
-    private Date updateTime;
+    private String cookie;
 
+    private String plat;
 }

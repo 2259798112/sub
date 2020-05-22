@@ -2,31 +2,20 @@ package top.duwd.sub.job;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.cxytiandi.elasticjob.annotation.ElasticJobConf;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-import tk.mybatis.mapper.genid.GenId;
-import top.duwd.common.config.Const;
-import top.duwd.common.domain.sub.entity.SubQuestion;
 import top.duwd.common.domain.sub.entity.SubQuestionDetail;
-import top.duwd.common.service.proxy.ProxyService;
 import top.duwd.dutil.date.DateUtil;
 import top.duwd.sub.service.SubQuestionDetailService;
 import top.duwd.sub.service.SubQuestionService;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.net.Proxy;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-@ElasticJobConf(name = "ElasticQuestionPrepareJob", cron = "0 50 * * * ?", shardingTotalCount = 1,description = "准备数据")
+//@ElasticJobConf(name = "ElasticQuestionPrepareJob", cron = "0 50 * * * ?", shardingTotalCount = 1,description = "准备数据")
 @Slf4j
 public class ElasticQuestionPrepareJob implements SimpleJob {
     @Autowired

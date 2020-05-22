@@ -1,6 +1,5 @@
 package top.duwd.sub.job;
 
-import com.cxytiandi.elasticjob.annotation.ElasticJobConf;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,7 @@ import java.net.Proxy;
 import java.util.Date;
 import java.util.List;
 
-@ElasticJobConf(name = "ElasticQuestionJob", cron = "0/2 0-20 * * * ?", shardingTotalCount = 10, description = "问题快照任务")
+//@ElasticJobConf(name = "ElasticQuestionJob", cron = "0/2 0-20 * * * ?", shardingTotalCount = 10, description = "问题快照任务")
 @Slf4j
 public class ElasticQuestionJob implements SimpleJob {
 

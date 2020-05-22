@@ -49,6 +49,9 @@ public class ErrorCodes {
     public static final int KEYWORD_ADD_ERROR = 80001;
     public static final String KEYWORD_ADD_ERROR_VALUE = "关键词添加异常";
 
+    public static final int KEYWORD_BAIDU_COOKIE = 80002;
+    public static final String KEYWORD_BAIDU_COOKIE_VALUE = "Baidu Cookie 异常,请重新添加";
+
 
     static {
         map.put(SYSTEM_ERROR, SYSTEM_ERROR_VALUE);
@@ -65,6 +68,7 @@ public class ErrorCodes {
         map.put(SUB_QUESTION_IS_NOT_A_QUESTION, SUB_QUESTION_IS_NOT_A_QUESTION_VALUE);
 
         map.put(KEYWORD_ADD_ERROR, KEYWORD_ADD_ERROR_VALUE);
+        map.put(KEYWORD_BAIDU_COOKIE, KEYWORD_BAIDU_COOKIE_VALUE);
     }
 
 }

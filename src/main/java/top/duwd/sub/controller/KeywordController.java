@@ -1,6 +1,5 @@
 package top.duwd.sub.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +31,8 @@ public class KeywordController {
      * @param json
      * {
      *     "keyword":"手机",
-     *     "plat":["baidu","chinaZ"],
-     *     "import":["华为手机","魅族手机"]
+     *     "plat":"baidu/chinaZ",
+     *     "import":"华为手机/魅族手机"
      * }
      * @return
      */
@@ -41,8 +40,8 @@ public class KeywordController {
     public ApiResult keywordAdd(@CurrentUser SubUser subUser, @RequestBody String json) {
         JSONObject jsonObject = JSONObject.parseObject(json);
         String keyword = jsonObject.getString("keyword");
-        JSONArray platArray = jsonObject.getJSONArray("plat");
-        JSONArray importArray = jsonObject.getJSONArray("import");
+        String platArray = jsonObject.getString("plat");
+        String importArray = jsonObject.getString("import");
         int add = keywordUserService.add(subUser, keyword, platArray, importArray);
         return apm.success(add);
     }

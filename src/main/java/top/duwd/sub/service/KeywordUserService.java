@@ -1,27 +1,19 @@
 package top.duwd.sub.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import tk.mybatis.mapper.entity.Example;
-import top.duwd.common.config.Const;
-import top.duwd.common.domain.sub.entity.Keyword;
 import top.duwd.common.domain.sub.entity.KeywordUser;
 import top.duwd.common.domain.sub.entity.SubUser;
 import top.duwd.common.exception.DuExceptionManager;
 import top.duwd.common.exception.ErrorCodes;
-import top.duwd.common.mapper.sub.KeywordMapper;
 import top.duwd.common.mapper.sub.KeywordUserMapper;
-import top.duwd.dutil.date.DateUtil;
-import top.duwd.dutil.http.html.Baidu;
-import top.duwd.dutil.http.html.ChinaZ;
-import top.duwd.dutil.http.html.dto.BaiduSearchResult;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -78,8 +70,13 @@ public class KeywordUserService implements IBaseService<KeywordUser> {
         return keywordUserMapper.findListToParse(start, end);
     }
 
+    /**
+     * 跟新时间
+     * @param keywordUser
+     * @return
+     */
     @Transactional
-    public int update(KeywordUser keywordUser){
+    public int updateTime(KeywordUser keywordUser){
         keywordUser.setUpdateTime(new Date());
         return keywordUserMapper.updateByPrimaryKey(keywordUser);
     }

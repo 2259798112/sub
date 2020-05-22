@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="top.duwd.common.mapper.sub.KeywordBaiduSearchResultMapper" >
+  <resultMap id="BaseResultMap" type="top.duwd.common.domain.sub.entity.KeywordBaiduSearchResult" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="keyword" property="keyword" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="url_source" property="urlSource" jdbcType="VARCHAR" />
+    <result column="url_real" property="urlReal" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="baidu_type" property="baiduType" jdbcType="VARCHAR" />
+    <result column="baidu_page" property="baiduPage" jdbcType="INTEGER" />
+    <result column="result_order" property="resultOrder" jdbcType="INTEGER" />
+    <result column="target_site" property="targetSite" jdbcType="VARCHAR" />
+    <result column="rs" property="rs" jdbcType="VARCHAR" />
+  </resultMap>
+<!--
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select id, keyword, title, url_source, url_real, create_time, update_time, baidu_type, 
+    baidu_page, result_order, target_site
+    from t_keyword_baidu_search_result
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, keyword, title, url_source, url_real, create_time, update_time, baidu_type, 
+    baidu_page, result_order, target_site
+    from t_keyword_baidu_search_result
+  </select>
+-->
+
+
+  <insert id="insertList" parameterType="java.util.List" >
+    insert into t_keyword_baidu_search_result(id, keyword, title, url_source, url_real, create_time, update_time, baidu_type,baidu_page, result_order, target_site ,rs) values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.id}, #{item.keyword}, #{item.title}, #{item.urlSource}, #{item.urlReal}, #{item.createTime}, #{item.updateTime}, #{item.baiduType},#{item.baiduPage}, #{item.resultOrder}, #{item.targetSite}, #{item.rs})
+    </foreach>
+  </insert>
+
+</mapper>
