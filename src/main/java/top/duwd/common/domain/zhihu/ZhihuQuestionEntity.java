@@ -4,11 +4,9 @@ package top.duwd.common.domain.zhihu;
 import lombok.Data;
 
 import javax.persistence.Id;
-import javax.persistence.Table;
 import java.util.Date;
 
 @Data
-@Table(name = "t_zhihu_question")
 public class ZhihuQuestionEntity {
     @Id
     private Integer id;// int(11) NOT NULL,

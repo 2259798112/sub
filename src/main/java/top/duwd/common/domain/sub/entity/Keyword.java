@@ -2,6 +2,7 @@ package top.duwd.common.domain.sub.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -10,12 +11,11 @@ import java.util.Date;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "t_keyword")
 public class Keyword implements Serializable {
     @Id
     private Integer id;
-    private Integer counter;
-    private Integer counterM;
 
     private String keywordMain;
 
@@ -27,4 +27,7 @@ public class Keyword implements Serializable {
 
     private Date updateTime;
 
+    private Integer counter;
+
+    private Integer counterM;
 }

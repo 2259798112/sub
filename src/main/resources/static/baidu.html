@@ -3,15 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>ECharts</title>
+    <title>关键词发现 -- 懂知乎</title>
 
-    <link rel="stylesheet" href="https://zhihu-d.oss-cn-shanghai.aliyuncs.com/bulma/bulma-0.8.2/css/bulma.min.css">
+<!--    bulma-->
+    <link href="https://cdn.bootcdn.net/ajax/libs/bulma/0.8.2/css/bulma.min.css" rel="stylesheet">
+<!--    jquery-->
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <style>
         th {
             white-space: nowrap;
         }
-
+        .help {
+            display: none;
+        }
         .nw {
             white-space: nowrap;
         }
@@ -34,8 +38,11 @@
 
     <div id="navbarBasicExample" class="navbar-menu">
         <div class="navbar-start">
-            <a class="navbar-item">
+            <a class="navbar-item" href="/home.html">
                 主页
+            </a>
+            <a class="navbar-item" href="/baidu.html">
+                关键词挖掘
             </a>
         </div>
 
@@ -66,13 +73,41 @@
             <div class="field-body">
                 <div class="field">
                     <p class="control is-expanded">
-                        <input class="input" type="text" placeholder="如：手机">
+                        <input class="input" type="text" placeholder="如：手机" id="iKeywordMain">
                     </p>
                 </div>
 
                 <div class="field">
                     <div class="control">
-                        <button class="button is-link">提交</button>
+                        <button class="button is-link" id="iBtnSubmit">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="field is-horizontal">
+            <div class="field-label">
+                <label class="label"></label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div class="control">
+                        <p class="help is-danger" id="iKeywordMainHelp">主关键词不能为空</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="field is-horizontal">
+            <div class="field-label">
+                <label class="label">导入关键词</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div class="control">
+                        <textarea class="textarea" placeholder="关键词列表 使用[/]分割, 如：苹果手机/小米手机/华为手机"
+                                  id="iImportList"></textarea>
                     </div>
                 </div>
             </div>
@@ -81,30 +116,36 @@
 
         <div class="field is-horizontal">
             <div class="field-label">
-                <label class="label">主关键词</label>
+                <label class="label">关键词挖掘</label>
             </div>
             <div class="field-body">
                 <div class="field">
-                    <div class="control">
-                        <textarea class="textarea" placeholder="关键词列表 使用[/]分割, 如：苹果手机/小米手机/华为手机"></textarea>
-                    </div>
+                    <p class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" value="Baidu">
+                            Baidu
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" value="ChinaZ">
+                            ChinaZ
+                        </label>
+                    </p>
                 </div>
             </div>
         </div>
+
         <div class="field is-horizontal">
             <div class="field-label">
-                <label class="label">百度Cookie</label>
+                <label class="label"></label>
             </div>
             <div class="field-body">
                 <div class="field">
                     <div class="control">
-                        <textarea class="textarea" placeholder="填写个人Baidu Cookie"></textarea>
+                        <p class="help is-danger" id="iPlatImportHelp">导入与平台不能同时为空</p>
                     </div>
                 </div>
             </div>
         </div>
-
-
     </div>
 
 </section>
@@ -115,5 +156,59 @@
 
 
 <script type="text/javascript">
+
+    $("#iBtnSubmit").click(function () {
+
+        if ($("#iKeywordMain").val().trim() === '' ) {
+            $("#iKeywordMainHelp").css("display", "block");
+        }else {
+            $("#iKeywordMainHelp").css("display", "none");
+        }
+
+        if ($("#iImportList").val().trim() === '' && getPlat().length ===0){
+            $("#iPlatImportHelp").css("display", "block");
+            return;
+        }else {
+            $("#iPlatImportHelp").css("display", "none");
+        }
+
+        keywordAdd()
+    });
+
+    const BASE_URL = "http://127.0.0.1:9001";
+    function keywordAdd() {
+
+        let url = BASE_URL + "/keyword/add";
+        let obj = {};
+        obj.keyword = $("#iKeywordMain").val().trim();
+        obj.importArray = $("#iImportList").val().trim();
+        obj.platArray = getPlat();
+
+        let token = localStorage.getItem("token");
+
+        $.ajax({
+            url: url,
+            type: "POST", //send it through get method
+            data: JSON.stringify(obj),
+            headers: {token: token},
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (responseBody) {
+            },
+        });
+
+
+    }
+
+
+    function getPlat() {
+        let plat = [];
+        $("input:checked").each(function () {//把所有被选中的复选框的值存入数组
+            let v = $(this).val();
+            plat.push(v);
+        });
+        return plat;
+    }
+
 
 </script>

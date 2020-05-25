@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="top.duwd.common.mapper.sub.ZhihuQuestionBasicMapper" >
+  <resultMap id="BaseResultMap" type="top.duwd.common.domain.sub.entity.ZhihuQuestionBasic" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="qid" property="qid" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="question_type" property="questionType" jdbcType="VARCHAR" />
+    <result column="created" property="created" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="answer_count" property="answerCount" jdbcType="INTEGER" />
+    <result column="visit_count" property="visitCount" jdbcType="INTEGER" />
+    <result column="comment_count" property="commentCount" jdbcType="INTEGER" />
+    <result column="follower_count" property="followerCount" jdbcType="INTEGER" />
+    <result column="collapsed_answer_count" property="collapsedAnswerCount" jdbcType="INTEGER" />
+    <result column="author_id" property="authorId" jdbcType="VARCHAR" />
+    <result column="author_name" property="authorName" jdbcType="VARCHAR" />
+    <result column="author_avatar_url" property="authorAvatarUrl" jdbcType="VARCHAR" />
+    <result column="author_url_token" property="authorUrlToken" jdbcType="VARCHAR" />
+    <result column="author_is_org" property="authorIsOrg" jdbcType="BIT" />
+    <result column="author_type" property="authorType" jdbcType="VARCHAR" />
+    <result column="author_user_type" property="authorUserType" jdbcType="VARCHAR" />
+    <result column="author_headline" property="authorHeadline" jdbcType="VARCHAR" />
+    <result column="author_gender" property="authorGender" jdbcType="INTEGER" />
+    <result column="author_is_advertiser" property="authorIsAdvertiser" jdbcType="BIT" />
+    <result column="author_is_privacy" property="authorIsPrivacy" jdbcType="BIT" />
+    <result column="voteup_count" property="voteupCount" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="visit_answer_rate" property="visitAnswerRate" jdbcType="INTEGER" />
+    <result column="visit_follow_rate" property="visitFollowRate" jdbcType="INTEGER" />
+    <result column="follow_answer_rate" property="followAnswerRate" jdbcType="INTEGER" />
+    <result column="visit_day_rate" property="visitDayRate" jdbcType="INTEGER" />
+  </resultMap>
+<!--
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select id, qid, title, question_type, created, updated_time, url, answer_count, visit_count, 
+    comment_count, follower_count, collapsed_answer_count, author_id, author_name, author_avatar_url, 
+    author_url_token, author_is_org, author_type, author_user_type, author_headline, 
+    author_gender, author_is_advertiser, author_is_privacy, voteup_count, create_time, 
+    update_time, visit_answer_rate, visit_follow_rate, follow_answer_rate, visit_day_rate
+    from t_zhihu_question_basic
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, qid, title, question_type, created, updated_time, url, answer_count, visit_count, 
+    comment_count, follower_count, collapsed_answer_count, author_id, author_name, author_avatar_url, 
+    author_url_token, author_is_org, author_type, author_user_type, author_headline, 
+    author_gender, author_is_advertiser, author_is_privacy, voteup_count, create_time, 
+    update_time, visit_answer_rate, visit_follow_rate, follow_answer_rate, visit_day_rate
+    from t_zhihu_question_basic
+  </select>
+-->
+</mapper>

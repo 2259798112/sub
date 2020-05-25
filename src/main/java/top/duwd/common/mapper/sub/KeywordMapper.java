@@ -11,7 +11,12 @@ public interface KeywordMapper extends Mapper<Keyword> {
 
     int insertList(List<Keyword> list);
 
-    @Select("SELECT t.* from t_keyword t where t.counter < #{param1} and t.counter_m < #{param1} ORDER BY t.id DESC LIMIT #{param2} ")
+    @Select("SELECT t.* from t_keyword t where t.counter < #{param1} or t.counter_m < #{param1} ORDER BY t.id DESC LIMIT #{param2} ")
     @ResultMap("BaseResultMap")
     List<Keyword> findKeyworToBaiduSearch(int searchCount,int size);
+
+
+    @Select("SELECT t.* from t_keyword t ORDER BY t.id DESC LIMIT 1 ")
+    @ResultMap("BaseResultMap")
+    Keyword findLast();
 }

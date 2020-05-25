@@ -3,7 +3,6 @@ package top.duwd.common.service.proxy;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.RowBounds;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
@@ -67,7 +66,6 @@ public class ProxyService {
         }
     }
 
-    @Nullable
     public Proxy getProxyAndSaveDB() {
         //从网络获取最新IP
         JSONObject moguProxy = ProxyUtil.getMoguProxy();
@@ -85,7 +83,8 @@ public class ProxyService {
             return null;
         }
     }
-    @Nullable
+
+
     public Proxy getProxyAndSaveDB(int flag) {
         //从网络获取最新IP
         JSONObject moguProxy = ProxyUtil.getMoguProxy();

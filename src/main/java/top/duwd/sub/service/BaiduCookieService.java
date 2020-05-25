@@ -3,6 +3,7 @@ package top.duwd.sub.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 import top.duwd.common.domain.sub.entity.BaiduCookie;
 import top.duwd.common.mapper.sub.BaiduCookieMapper;
@@ -28,6 +29,11 @@ public class BaiduCookieService {
         } else {
             return baiduCookies.get(0);
         }
+    }
+
+    @Transactional
+    public int save(BaiduCookie en){
+        return baiduCookieMapper.insert(en);
     }
 
 }

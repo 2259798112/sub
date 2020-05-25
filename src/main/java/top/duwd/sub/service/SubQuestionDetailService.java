@@ -6,7 +6,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTimeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Example;
 import top.duwd.common.config.Const;
-import top.duwd.common.domain.sub.entity.SubQuestion;
 import top.duwd.common.domain.sub.entity.SubQuestionDetail;
+import top.duwd.common.domain.sub.entity.ZhihuQuestionBasic;
 import top.duwd.common.domain.zhihu.ZhihuQuestionEntity;
 import top.duwd.common.mapper.sub.SubQuestionDetailMapper;
 import top.duwd.common.service.proxy.ProxyService;
@@ -30,8 +29,6 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -41,6 +38,8 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
     private SubQuestionDetailMapper subQuestionDetailMapper;
     @Resource
     private RequestBuilder requestBuilder;
+    @Resource
+    private ZhihuQuestionBasicService zhihuQuestionBasicService;
     @Resource
     private ProxyService proxyService;
 
@@ -157,6 +156,132 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
         return parseQuestion(jsonObject);
     }
 
+    @Transactional
+    public int parseBasic(int questionId,int id, Proxy proxy) {
+
+        String url = QUESTION_BASE + questionId;
+        String htmlString = null;
+        //同意使用ip代理
+
+        //获取1min内的ip订单
+        try {
+            htmlString = requestBuilder.getWithProxy(url, hMap, proxy);
+        } catch (SocketTimeoutException e) {
+            log.error("connect timed out {}", e.getMessage());
+            //代理失效
+            return Const.PROXY_INVALID;
+        } catch (IOException e) {
+            log.error("java.io.IOException {}", e.getMessage());
+            //connection 403
+            //if 404  update title=404
+            if (e.getMessage().contains("code=404")){
+                log.error("404");
+                ZhihuQuestionBasic basic = new ZhihuQuestionBasic();
+                basic.setId(id);
+                basic.setQid(questionId);
+                basic.setTitle("404");
+                Date date = new Date();
+                basic.setCreateTime(date);
+                basic.setUpdateTime(date);
+                return zhihuQuestionBasicService.update(basic);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("系统异常");
+        }
+
+        if (StringUtils.isEmpty(htmlString)) {
+            return 0;
+        }
+
+        Document html = Jsoup.parse(htmlString);
+
+        if ("安全验证 - 知乎".equalsIgnoreCase(html.title())) {
+            //知乎反扒限制
+            log.info("需要更换IP={}", proxy.address().toString());
+            return Const.PROXY_INVALID;
+        } else {
+            log.info(html.title() + " " + questionId);
+        }
+
+        Element ele = html.getElementById("js-initialData");
+
+        String text = ele.toString();
+        String start = "<script id=\"js-initialData\" type=\"text/json\">";
+        String end = "</script>";
+        String substring = text.substring(start.length(), text.length() - end.length());
+        JSONObject jsonObject = JSON.parseObject(substring);
+        return parseQuestionBasic(jsonObject,id,questionId);
+
+    }
+
+
+    public int parseQuestionBasic(JSONObject jsonObject, int primaryId,int questionId){
+        int count = 0;
+        if (jsonObject != null) {
+            JSONObject entities = jsonObject.getJSONObject("initialState").getJSONObject("entities");
+            JSONObject questions = entities.getJSONObject("questions");
+            Set<String> ids = questions.keySet();
+            if (ids.size() == 0){//登录
+                ZhihuQuestionBasic basic = new ZhihuQuestionBasic();
+                basic.setId(primaryId);
+                basic.setTitle("login");
+                basic.setQid(questionId);
+                count += zhihuQuestionBasicService.update(basic);
+                log.info("save success = {}", JSON.toJSONString(basic));
+                return count;
+            }
+            for (String id : ids) {
+                JSONObject questionsJSONObject = questions.getJSONObject(id);
+                if (questionsJSONObject != null) {
+                    ZhihuQuestionEntity entity = questionsJSONObject.toJavaObject(ZhihuQuestionEntity.class);
+
+                    JSONObject author = questionsJSONObject.getJSONObject("author");
+                    entity.setAuthorId(author.getString("id"));
+                    entity.setAuthorName(author.getString("name"));
+                    entity.setAuthorUrlToken(author.getString("urlToken"));
+                    entity.setAuthorAvatarUrl(author.getString("avatarUrl"));
+                    entity.setAuthorIsOrg(author.getBoolean("isOrg"));
+                    entity.setAuthorType(author.getString("type"));
+                    entity.setAuthorUserType(author.getString("userType"));
+                    entity.setAuthorHeadline(author.getString("headline"));
+                    entity.setAuthorGender(author.getIntValue("gender"));
+                    entity.setAuthorIsAdvertiser(author.getBoolean("isAdvertiser"));
+                    entity.setAuthorIsPrivacy(author.getBoolean("isPrivacy"));
+
+                    entity.setCreated(new Date(questionsJSONObject.getLongValue("created") * 1000));
+                    entity.setUpdatedTime(new Date(questionsJSONObject.getLongValue("updatedTime") * 1000));
+
+                    ZhihuQuestionBasic basic = new ZhihuQuestionBasic();
+                    BeanUtils.copyProperties(entity, basic);
+                    Date date = new Date();
+                    basic.setCreateTime(date);
+                    basic.setUpdateTime(date);
+                    basic.setId(primaryId);
+                    basic.setQid(entity.getId());
+                    basic.setVisitAnswerRate((entity.getAnswerCount() == 0)? entity.getVisitCount() : entity.getVisitCount() / entity.getAnswerCount());
+                    basic.setVisitFollowRate((entity.getFollowerCount() == 0)? entity.getVisitCount() : entity.getVisitCount() / entity.getFollowerCount());
+                    basic.setFollowAnswerRate((entity.getAnswerCount() == 0)? entity.getVisitCount() : entity.getFollowerCount() / entity.getAnswerCount());
+                    int days = (int) ((new Date().getTime() - entity.getCreated().getTime()) / (1000*3600*24));
+                    basic.setVisitDayRate(entity.getVisitCount() / days);
+
+
+                    try {
+                        count += zhihuQuestionBasicService.update(basic);
+                        log.info("save success = {}", JSON.toJSONString(basic));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        log.error("save exception = {}", JSON.toJSONString(basic));
+                    }
+
+
+                    break;
+                }
+            }
+        }
+        return count;
+
+    }
 
     public int parseQuestion(JSONObject jsonObject) {
         int count = 0;
@@ -189,6 +314,7 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
                         e.printStackTrace();
                         log.error("save exception = {}", JSON.toJSONString(subQuestionDetailEntity));
                     }
+
                     break;
                 }
             }

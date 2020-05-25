@@ -12,7 +12,7 @@ public interface KeywordUserMapper extends Mapper<KeywordUser> {
 
     @Select("select id, keyword_main, user_id, plat, import_list, create_time, update_time" +
             " from t_keyword_user t" +
-            " where t.create_time != t.update_time and t.create_time BETWEEN #{param1} AND #{param2}")
+            " where t.create_time = t.update_time and t.create_time BETWEEN #{param1} AND #{param2}")
     @ResultMap("BaseResultMap")
     List<KeywordUser> findListToParse(Date start, Date end);
 }

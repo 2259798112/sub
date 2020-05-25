@@ -22,6 +22,8 @@ public class KeywordUserService implements IBaseService<KeywordUser> {
     @Autowired
     private KeywordUserMapper keywordUserMapper;
     @Autowired
+    private BaiduCookieService baiduCookieService;
+    @Autowired
     private DuExceptionManager em;
 
     public int add(SubUser subUser, String keyword, String platArray, String importArray) {
@@ -47,6 +49,11 @@ public class KeywordUserService implements IBaseService<KeywordUser> {
 
     @Transactional
     public int save(KeywordUser keywordUser) {
+        //查重
+        int count = keywordUserMapper.selectCount(keywordUser);
+        if (count > 0){
+            return 1;
+        }
         return keywordUserMapper.insert(keywordUser);
     }
 

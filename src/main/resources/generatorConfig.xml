@@ -36,7 +36,7 @@
                              type="XMLMAPPER"></javaClientGenerator>
 
 
-        <table tableName="t_keyword_baidu_search_result" domainObjectName="KeywordBaiduSearchResult"
+        <table tableName="t_zhihu_question_basic" domainObjectName="ZhihuQuestionBasic"
                enableInsert="false"
                enableSelectByPrimaryKey="true"
                enableDeleteByPrimaryKey="false"

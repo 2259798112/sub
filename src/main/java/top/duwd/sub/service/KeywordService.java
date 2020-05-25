@@ -2,7 +2,6 @@ package top.duwd.sub.service;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,70 +42,103 @@ public class KeywordService implements IBaseService<Keyword> {
         ArrayList<Keyword> keywords = new ArrayList<>();
         Date date = new Date();
         for (String keywordTail : keywordList) {
-            Keyword keyword = new Keyword(null, 0, 0, keywordMain, keywordTail, plat, date, date);
+            if (StringUtils.isEmpty(keywordTail)) {
+                continue;
+            }
+            Keyword keyword = new Keyword(null, keywordMain, keywordTail, plat, date, date, 0, 0);
             keywords.add(keyword);
         }
         return insertList(keywords);
     }
 
-    //用于定时调度
+    //百度PC + 百度Mobile 搜索相关关键词
     public List<Keyword> findKeywordListFromBaidu(String keyword) {
-        HashMap<String, String> hMapPC = getBaiduHeaderMap();
+        Map<String, String> hMapPC = getBaiduHeaderMap(Const.BaiduPC);
+        boolean wait = true;
 
         //baidu PC
         ArrayList<Keyword> keywords = new ArrayList<>();
+        HashSet<String> setPC = new HashSet<>();
+        HashSet<String> setMo = new HashSet<>();
+
         Date date = new Date();
 
-        BaiduSearchResult searchPC = baidu.searchPC(hMapPC, keyword, 1, null);
+        BaiduSearchResult searchPC = baidu.searchPC(hMapPC, keyword, 1, null,wait);
         if (searchPC != null && searchPC.getRs() != null && searchPC.getRs().size() > 0) {
             for (String rsKeyword : searchPC.getRs()) {//遍历第一页 相关词
+                if (setPC.contains(rsKeyword)) {
+                    continue;
+                } else {
+                    setPC.add(rsKeyword);
+                }
+
                 serachRSPC(keyword, keywords, date, rsKeyword);
 
                 //迭代一层
-                BaiduSearchResult searchPCChild = baidu.searchPC(hMapPC, rsKeyword, 1, null);
+                BaiduSearchResult searchPCChild = baidu.searchPC(hMapPC, rsKeyword, 1, null,wait);
                 if (searchPCChild != null && searchPCChild.getRs() != null && searchPCChild.getRs().size() > 0) {
-                    serachRSPC(keyword, keywords, date, rsKeyword);
+                    for (String r : searchPCChild.getRs()) {
+                        if (setPC.contains(r)) {
+                            continue;
+                        } else {
+                            setPC.add(r);
+                        }
+
+                        serachRSPC(keyword, keywords, date, r);
+                    }
                 }
             }
         }
 
-        HashMap<String, String> hMapMobile = null;
-        BaiduSearchResult searchM = baidu.searchM(hMapMobile, keyword, 1, null);
+        Map<String, String> hMapMobile = getBaiduHeaderMap(Const.BaiduMo);
+        BaiduSearchResult searchM = baidu.searchM(hMapMobile, keyword, 1, null,wait);
         if (searchM != null && searchM.getRs() != null && searchM.getRs().size() > 0) {
             for (String rsKeyword : searchM.getRs()) {//遍历第一页 相关词
                 searchRSMobile(keyword, keywords, date, rsKeyword);
+                if (setMo.contains(rsKeyword)) {
+                    continue;
+                } else {
+                    setMo.add(rsKeyword);
+                }
 
                 //迭代一层
-                BaiduSearchResult searchMChild = baidu.searchM(hMapMobile, rsKeyword, 1, null);
+                BaiduSearchResult searchMChild = baidu.searchM(hMapMobile, rsKeyword, 1, null,wait);
                 if (searchMChild != null && searchMChild.getRs() != null && searchMChild.getRs().size() > 0) {
-                    searchRSMobile(keyword, keywords, date, rsKeyword);
+                    for (String r : searchMChild.getRs()) {
+                        if (setMo.contains(r)) {
+                            continue;
+                        } else {
+                            setMo.add(r);
+                        }
+                        searchRSMobile(keyword, keywords, date, r);
+                    }
                 }
             }
         }
         return keywords;
     }
 
-    @NotNull
-    public HashMap<String, String> getBaiduHeaderMap() {
-        HashMap<String, String> hMapPC = null;
-        //读取 baidu cookie
-        BaiduCookie baiduCookie = baiduCookieService.findListInDays(1, Const.KEYWORD_PLAT_Baidu);
-        if (baiduCookie == null) {
+    public Map<String, String> getBaiduHeaderMap(String plat) {
+        BaiduCookie cookie = baiduCookieService.findListInDays(1, plat);
+        if (cookie == null){
             throw em.create(ErrorCodes.KEYWORD_BAIDU_COOKIE);
         }
 
-        hMapPC.put("Cookie", baiduCookie.getCookie());
-        hMapPC.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36");
-        return hMapPC;
+        if (Const.BaiduPC.equalsIgnoreCase(plat)){
+            return Baidu.getPCMap(cookie.getCookie());
+        }else {
+            return Baidu.getMoMap(cookie.getCookie());
+        }
     }
 
+
     private void searchRSMobile(String keyword, ArrayList<Keyword> keywords, Date date, String rsKeyword) {
-        Keyword pcKeyword = new Keyword(null, 0, 0, keyword, rsKeyword, Const.BaiduMo, date, date);
+        Keyword pcKeyword = new Keyword(null, keyword, rsKeyword, Const.BaiduMo, date, date, 0, 0);
         keywords.add(pcKeyword);
     }
 
     private void serachRSPC(String keyword, ArrayList<Keyword> keywords, Date date, String rsKeyword) {
-        Keyword pcKeyword = new Keyword(null, 0, 0, keyword, rsKeyword, Const.BaiduPC, date, date);
+        Keyword pcKeyword = new Keyword(null, keyword, rsKeyword, Const.BaiduPC, date, date, 0, 0);
         keywords.add(pcKeyword);
     }
 
@@ -121,7 +153,7 @@ public class KeywordService implements IBaseService<Keyword> {
         ArrayList<Keyword> list = new ArrayList<>(keywords.size());
         Date date = new Date();
         for (String word : keywords) {
-            Keyword entity = new Keyword(null, 0, 0, keyword, word, Const.KEYWORD_PLAT_ChinaZ, date, date);
+            Keyword entity = new Keyword(null, keyword, word, Const.KEYWORD_PLAT_ChinaZ, date, date, 0, 0);
             list.add(entity);
         }
         return list;
@@ -146,6 +178,11 @@ public class KeywordService implements IBaseService<Keyword> {
         example.createCriteria().andEqualTo(k, v);
         return keywordMapper.selectByExample(example);
     }
+
+    public Keyword findLastOne() {
+        return keywordMapper.findLast();
+    }
+
 
     @Override
     public List<Keyword> findListByMap(Map<String, Object> map) {
@@ -183,5 +220,10 @@ public class KeywordService implements IBaseService<Keyword> {
     public List<Keyword> findKeyworToBaiduSearch(int count, int size) {
         List<Keyword> list = keywordMapper.findKeyworToBaiduSearch(count, size);
         return list;
+    }
+
+    public int updateByPrimaryKey(Keyword keyword) {
+        keyword.setUpdateTime(new Date());
+        return keywordMapper.updateByPrimaryKey(keyword);
     }
 }

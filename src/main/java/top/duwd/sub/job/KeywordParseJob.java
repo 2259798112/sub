@@ -1,6 +1,7 @@
 package top.duwd.sub.job;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.cxytiandi.elasticjob.annotation.ElasticJobConf;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
@@ -10,6 +11,7 @@ import org.springframework.util.StringUtils;
 import top.duwd.common.config.Const;
 import top.duwd.common.domain.sub.entity.Keyword;
 import top.duwd.common.domain.sub.entity.KeywordUser;
+import top.duwd.common.exception.DuException;
 import top.duwd.dutil.date.DateUtil;
 import top.duwd.sub.service.KeywordService;
 import top.duwd.sub.service.KeywordUserService;
@@ -36,34 +38,55 @@ public class KeywordParseJob implements SimpleJob {
 
     public void run() {
         //1,获取最近未处理的 user keyword
-        List<KeywordUser> list = keywordUserService.findListToParse(DateUtil.addMin(new Date(), -60), new Date());
+        List<KeywordUser> list = keywordUserService.findListToParse(DateUtil.addMin(new Date(), -60 * 24 * 3), new Date());
         if (list == null || list.size() == 0) {
             return;
         }
 
         for (KeywordUser keywordUser : list) {
             importKeywordCustom(keywordUser);
-            importKeywordPlat(keywordUser);
-            keywordUserService.updateTime(keywordUser);
+            int i = importKeywordPlat(keywordUser);
+            if (i > 0){
+                log.error("plat 扩展关键词异常");
+            }else {
+                keywordUserService.updateTime(keywordUser);
+            }
         }
 
     }
-
-    private void importKeywordPlat(KeywordUser keywordUser) {
+    //平台拓展关键词
+    private int importKeywordPlat(KeywordUser keywordUser) {
+        int failCount = 0;
         String plat = keywordUser.getPlat();
         if (StringUtils.isEmpty(plat)) {
 
         } else {
-            String[] plats = plat.split(S);
+            List<String> plats = JSONArray.parseArray(plat, String.class);
             for (String p : plats) {
                 if (Const.KEYWORD_PLAT_Baidu.equalsIgnoreCase(p)) {
-                    importKeywordBaidu(keywordUser);
+                    try {
+                        importKeywordBaidu(keywordUser);
+                    } catch (Exception e) {
+                        if (e instanceof DuException) {
+                            log.error(((DuException) e).getMsg());
+                        } else {
+                            e.printStackTrace();
+                        }
+                        failCount ++;
+                    }
                 }
+
                 if (Const.KEYWORD_PLAT_ChinaZ.equalsIgnoreCase(p)) {
-                    importKeywordChinaZ(keywordUser);
+                    try {
+                        importKeywordChinaZ(keywordUser);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        failCount++;
+                    }
                 }
             }
         }
+        return failCount;
     }
 
     private void importKeywordChinaZ(KeywordUser keywordUser) {
@@ -79,6 +102,10 @@ public class KeywordParseJob implements SimpleJob {
             }
 
             List<String> czKeyword = keywordService.filterImportList(keywordUser.getKeywordMain(), set, Const.KEYWORD_PLAT_ChinaZ);
+            if (czKeyword == null || czKeyword.size() == 0){
+                return;
+            }
+
             int i = keywordService.importKeyword(keywordUser.getKeywordMain(), czKeyword, Const.KEYWORD_PLAT_ChinaZ);
             if (i > 0) {
                 log.info("导入关键词[成功] [filterImportList={}]", JSON.toJSONString(czKeyword));
