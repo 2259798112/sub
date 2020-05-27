@@ -42,7 +42,7 @@ public class KeywordBaiduJob implements SimpleJob {
 
         boolean wait = true;
         //1,获取最近未处理的 user keyword
-        int size = 3;
+        int size = 10;
         int count = 3;
         List<Keyword> list = keywordService.findKeyworToBaiduSearch(count, size);
         if (list == null || list.size() == 0) {
@@ -55,14 +55,15 @@ public class KeywordBaiduJob implements SimpleJob {
             Map<String, String> moMap = keywordService.getBaiduHeaderMap(Const.BaiduMo);
 
             for (Keyword keyword : list) {
-                int countPC = 0;
-                int countMobile = 0;
+                int countPC = keyword.getCounter();
+                int countMobile = keyword.getCounterM();
 
                 if (keyword.getCounter()<3){
 
-                    BaiduSearchResult pcSearch = baidu.searchPC(pcMap, keyword.getKeywordTail(), 1, null,wait);
+//                    BaiduSearchResult pcSearch = baidu.searchPC(pcMap, keyword.getKeywordTail(), 1, null,wait);
+                    BaiduSearchResult pcSearch = baidu.searchPCBySelenium(keyword.getKeywordTail(), 1);
                     log.info("baidu PC search [BaiduSearchResult={}]", JSON.toJSONString(pcSearch,SerializerFeature.PrettyFormat));
-                    if (pcSearch != null) {
+                    if (pcSearch != null && pcSearch.getItems().size() > 0) {
                         BaiduSearchResultList.add(pcSearch);
                         countPC = 3;
                     }else {
@@ -72,9 +73,10 @@ public class KeywordBaiduJob implements SimpleJob {
                 }
 
                 if (keyword.getCounterM()<3){
-                    BaiduSearchResult moSearch = baidu.searchM(moMap, keyword.getKeywordTail(), 1, null,wait);
+//                    BaiduSearchResult moSearch = baidu.searchM(moMap, keyword.getKeywordTail(), 1, null,wait);
+                    BaiduSearchResult moSearch = baidu.searchMobileBySelenium(keyword.getKeywordTail(), 1);
                     log.info("baidu mobile search [BaiduSearchResult={}]", JSON.toJSONString(moSearch, SerializerFeature.PrettyFormat));
-                    if (moSearch != null) {
+                    if (moSearch != null && moSearch.getItems().size()>0) {
                         //重定向
                         BaiduSearchResultList.add(moSearch);
                         countMobile = 3;

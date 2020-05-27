@@ -263,7 +263,7 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
                     basic.setVisitFollowRate((entity.getFollowerCount() == 0)? entity.getVisitCount() : entity.getVisitCount() / entity.getFollowerCount());
                     basic.setFollowAnswerRate((entity.getAnswerCount() == 0)? entity.getVisitCount() : entity.getFollowerCount() / entity.getAnswerCount());
                     int days = (int) ((new Date().getTime() - entity.getCreated().getTime()) / (1000*3600*24));
-                    basic.setVisitDayRate(entity.getVisitCount() / days);
+                    basic.setVisitDayRate((days == 0)?entity.getVisitCount(): entity.getVisitCount() / days);
 
 
                     try {

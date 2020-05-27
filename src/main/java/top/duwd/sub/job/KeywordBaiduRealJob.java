@@ -33,7 +33,7 @@ public class KeywordBaiduRealJob implements SimpleJob {
         String site= "知乎";
         checkReal(prefix);
 
-        List<KeywordBaiduSearchResult> list = baiduSearchResultService.findListNoUrlReal(site, 10);
+        List<KeywordBaiduSearchResult> list = baiduSearchResultService.findListNoUrlReal(site, 20);
         if (list == null || list.size() == 0) {
             log.info("没有要获取真实链接的关键词");
         } else {

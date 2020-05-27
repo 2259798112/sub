@@ -13,6 +13,7 @@ import top.duwd.common.domain.sub.entity.Keyword;
 import top.duwd.common.exception.DuExceptionManager;
 import top.duwd.common.exception.ErrorCodes;
 import top.duwd.common.mapper.sub.KeywordMapper;
+import top.duwd.dutil.date.DateUtil;
 import top.duwd.dutil.http.html.Baidu;
 import top.duwd.dutil.http.html.ChinaZ;
 import top.duwd.dutil.http.html.dto.BaiduSearchResult;
@@ -218,7 +219,7 @@ public class KeywordService implements IBaseService<Keyword> {
 
     //获取待搜索的关键词
     public List<Keyword> findKeyworToBaiduSearch(int count, int size) {
-        List<Keyword> list = keywordMapper.findKeyworToBaiduSearch(count, size);
+        List<Keyword> list = keywordMapper.findKeyworToBaiduSearch(count, size, DateUtil.addMin(new Date(),-60));
         return list;
     }
 
