@@ -1,6 +1,5 @@
 package top.duwd.sub.service;
 
-import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,32 +25,15 @@ public class ZhihuQuestionBasicService {
     private ZhihuQuestionBasicMapper mapper;
     @Autowired
     private KeywordBaiduSearchResultMapper keywordBaiduSearchResultMapper;
+    @Autowired
+    private BaiduSearchResultService baiduSearchResultService;
 
     public static final String prefix = "zhihu.com/question/";
+    public static final String SITE_ZHIHU = "知乎";
 
     //对 百度结果 知乎 去重
     public int deleteRepeat() {
-        List<Integer> minIdList = keywordBaiduSearchResultMapper.findRepeatIdListZhihu();
-        List<Integer> saveIdListAll = keywordBaiduSearchResultMapper.findRepeatIdListAllZhihu();
-        List<Integer> deleteAll = new ArrayList<>();
-        if (saveIdListAll != null && saveIdListAll.size() > 0) {
-
-            for (Integer i : saveIdListAll) {
-                if (!minIdList.contains(i)) {
-                    deleteAll.add(i);
-                }
-            }
-
-        }
-
-        if (deleteAll.size() > 0) {
-            log.info("删除重复数据 id list [{}]", JSON.toJSONString(deleteAll));
-            Example example = new Example(KeywordBaiduSearchResult.class);
-            example.createCriteria().andIn("id", deleteAll);
-            return keywordBaiduSearchResultMapper.deleteByExample(example);
-        } else {
-            return 0;
-        }
+       return baiduSearchResultService.deleteRepeat(SITE_ZHIHU);
     }
 
     /**
@@ -59,7 +41,7 @@ public class ZhihuQuestionBasicService {
      * @return
      */
     public List<KeywordBaiduSearchResult> findListZhihuQuestion() {
-        List<KeywordBaiduSearchResult> list = keywordBaiduSearchResultMapper.findListZhihuQuestionZhihu("%" + prefix + "%", 100);
+        List<KeywordBaiduSearchResult> list = keywordBaiduSearchResultMapper.findListBySite("%" + prefix + "%", 100,SITE_ZHIHU);
         List<KeywordBaiduSearchResult> results = new ArrayList<>();
         List<Integer> qids = new ArrayList<>();
 

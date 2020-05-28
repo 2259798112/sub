@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import tk.mybatis.mapper.entity.Example;
 import top.duwd.common.domain.sub.entity.KeywordBaiduSearchResult;
 import top.duwd.common.mapper.sub.KeywordBaiduSearchResultMapper;
 import top.duwd.dutil.http.html.dto.BaiduItem;
@@ -21,6 +22,31 @@ public class BaiduSearchResultService {
 
     @Autowired
     private KeywordBaiduSearchResultMapper mapper;
+
+    //对 百度结果 知乎 去重
+    public int deleteRepeat(String site) {
+        List<Integer> minIdList = mapper.findRepeatIdListBySite(site);
+        List<Integer> saveIdListAll = mapper.findRepeatIdListAllBySite(site);
+        List<Integer> deleteAll = new ArrayList<>();
+        if (saveIdListAll != null && saveIdListAll.size() > 0) {
+
+            for (Integer i : saveIdListAll) {
+                if (!minIdList.contains(i)) {
+                    deleteAll.add(i);
+                }
+            }
+
+        }
+
+        if (deleteAll.size() > 0) {
+            log.info("删除重复数据 id list [{}]", JSON.toJSONString(deleteAll));
+            Example example = new Example(KeywordBaiduSearchResult.class);
+            example.createCriteria().andIn("id", deleteAll);
+            return mapper.deleteByExample(example);
+        } else {
+            return 0;
+        }
+    }
 
     public int insertList(List<BaiduSearchResult> list) {
         // 转换成 KeywordBaiduSearchResult
