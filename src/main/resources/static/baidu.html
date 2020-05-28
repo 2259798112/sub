@@ -194,7 +194,8 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (responseBody) {
-                alert(JSON.parse(responseBody))
+                console.log("success")
+                $("#iKeywordMain").val("");
             },
         });
 
