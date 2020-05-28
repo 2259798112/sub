@@ -28,15 +28,15 @@ public interface KeywordBaiduSearchResultMapper extends Mapper<KeywordBaiduSearc
     List<KeywordBaiduSearchResult> findListNoUrlRealWithPrefix(String prefix,int limit);
 
 
-    @Select("select min(id) from t_keyword_baidu_search_result where url_real is not null and target_site='知乎' group by url_real")
-    List<Integer> findRepeatIdListZhihu();
+    @Select("select min(id) from t_keyword_baidu_search_result where url_real is not null and target_site=#{param1} group by url_real")
+    List<Integer> findRepeatIdListBySite(String targetSite);
 
-    @Select("select id from t_keyword_baidu_search_result where url_real is not null and target_site='知乎' ")
-    List<Integer> findRepeatIdListAllZhihu();
+    @Select("select id from t_keyword_baidu_search_result where url_real is not null and target_site=#{param1} ")
+    List<Integer> findRepeatIdListAllBySite(String targetSite);
 
 
-    @Select("select id, url_real from t_keyword_baidu_search_result where target_site='知乎' and result_order is NULL and url_real like #{param1} order by id desc limit #{param2}")
+    @Select("select id, url_real from t_keyword_baidu_search_result where target_site=#{param3} and result_order is NULL and url_real like #{param1} order by id desc limit #{param2}")
     @ResultMap("BaseResultMap")
-    List<KeywordBaiduSearchResult> findListZhihuQuestionZhihu(String prefix, int limit);
+    List<KeywordBaiduSearchResult> findListBySite(String prefix, int limit, String targetSite);
 
 }
