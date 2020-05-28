@@ -26,12 +26,16 @@ public class ZhihuQuestionBasicJob implements SimpleJob {
     @Autowired
     private BaiduSearchResultService baiduSearchResultService;
     @Autowired
+    private KeywordBaiduRealJob baiduRealJob;
+    @Autowired
     private ProxyService proxyService;
 
     public static final String S = "/";
+    public static final String SITE_ZHIHU = "知乎";
 
     @Override
     public void execute(ShardingContext shardingContext) {
+        baiduRealJob.genRealUrl(SITE_ZHIHU);
         run();
         parse();
     }
