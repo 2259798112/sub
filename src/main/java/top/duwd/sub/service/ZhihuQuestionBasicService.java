@@ -37,7 +37,7 @@ public class ZhihuQuestionBasicService {
     }
 
     /**
-     * 获取为处理的 百度 结果  知乎question
+     * 获取未处理的 百度结果  知乎question
      * @return
      */
     public List<KeywordBaiduSearchResult> findListZhihuQuestion() {

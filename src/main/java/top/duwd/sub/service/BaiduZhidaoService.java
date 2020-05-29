@@ -4,8 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import top.duwd.common.domain.sub.entity.KeywordBaiduSearchResult;
+import top.duwd.common.mapper.sub.KeywordBaiduSearchResultMapper;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +18,8 @@ public class BaiduZhidaoService {
 
     @Autowired
     private BaiduSearchResultService baiduSearchResultService;
+    @Autowired
+    private KeywordBaiduSearchResultMapper keywordBaiduSearchResultMapper;
 
     public static final String prefix = "zhidao.baidu.com/question/";
     public static final String SITE_ZHIDAO = "百度知道";
@@ -24,24 +29,30 @@ public class BaiduZhidaoService {
        return baiduSearchResultService.deleteRepeat(SITE_ZHIDAO);
     }
 
+    /**
+     * 获取未处理的 百度结果  知乎question
+     * @return
+     */
+    public List<KeywordBaiduSearchResult> findListZhidao() {
+        List<KeywordBaiduSearchResult> list = keywordBaiduSearchResultMapper.findListBySite("%" + prefix + "%", 100,SITE_ZHIDAO);
+        List<KeywordBaiduSearchResult> results = new ArrayList<>();
+        List<Long> qids = new ArrayList<>();
 
-    public static void main(String[] args) {
 
-        ArrayList<String> strings = new ArrayList<>();
-        strings.add("https://www.zhihu.com/question/25338860");
-        strings.add("https://www.zhihu.com/question/21324495?sort=created");
-        strings.add("https://www.zhihu.com/question/353163620/answer/875384348");
-        strings.add("https://zhuanlan.zhihu.com/p/89260253");
-
-        for (String string : strings) {
-            System.out.println(string);
-            long qid = findQid(string, prefix);
-
-            System.out.println(qid);
+        if (list != null && list.size() > 0) {
+            for (KeywordBaiduSearchResult url : list) {
+                long qid = findQid(url.getUrlReal(), prefix);
+                if (qid != 0 && qids.indexOf(qid) < 0) {
+                    qids.add(qid);
+                    results.add(url);
+                }
+            }
         }
-
+        if (results.size() > 0) {
+            return results;
+        }
+        return null;
     }
-
     private static long findQid(String content, String prefix) {
         if (StringUtils.isEmpty(content)) {
             return 0;
