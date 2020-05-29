@@ -1,6 +1,5 @@
 package top.duwd.sub.job;
 
-import com.cxytiandi.elasticjob.annotation.ElasticJobConf;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,7 @@ import java.net.Proxy;
 import java.util.Date;
 import java.util.List;
 
-@ElasticJobConf(name = "ZhihuQuestionBasicJob", cron = "0 */1 * * * ?", shardingTotalCount = 1, description = "知乎问题快照")
+//@ElasticJobConf(name = "ZhihuQuestionBasicJob", cron = "0 */1 * * * ?", shardingTotalCount = 1, description = "知乎问题快照")
 @Slf4j
 public class ZhihuQuestionBasicJob implements SimpleJob {
     @Autowired
@@ -35,22 +34,23 @@ public class ZhihuQuestionBasicJob implements SimpleJob {
 
     @Override
     public void execute(ShardingContext shardingContext) {
-        baiduRealJob.genRealUrl(SITE_ZHIHU);
-        run();
+        baiduRealJob.genRealUrl(SITE_ZHIHU); //更新real url
+        run();//去重数据
         parse();
     }
 
     public void run() {
 
-        //删除重复记录
-        //获取全部信息, https://www.zhihu.com/question 开头
+        //1，删除重复记录
+        //2，获取全部信息, https://www.zhihu.com/question 开头
         //插入数据
         //修改 记录
         int i = zhihuQuestionBasicService.deleteRepeat();
-        List<KeywordBaiduSearchResult> baiduSearchResultList = zhihuQuestionBasicService.findListZhihuQuestion();
+        List<KeywordBaiduSearchResult> baiduSearchResultList = zhihuQuestionBasicService.findListZhihuQuestionGenQid();
 
         if (baiduSearchResultList != null) {
             for (KeywordBaiduSearchResult searchResult : baiduSearchResultList) {
+                //创建基本信息 记录， 后续解析
                 int save = zhihuQuestionBasicService.save(searchResult);
                 if (save > 0) {
                     searchResult.setResultOrder(1);

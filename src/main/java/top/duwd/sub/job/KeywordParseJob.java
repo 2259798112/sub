@@ -2,7 +2,6 @@ package top.duwd.sub.job;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.cxytiandi.elasticjob.annotation.ElasticJobConf;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-@ElasticJobConf(name = "KeywordParseJob", cron = "0 */5 * * * ?", shardingTotalCount = 1, description = "关键词导入")
+//@ElasticJobConf(name = "KeywordParseJob", cron = "0 */5 * * * ?", shardingTotalCount = 1, description = "关键词导入")
 @Slf4j
 public class KeywordParseJob implements SimpleJob {
     @Autowired

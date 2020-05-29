@@ -37,21 +37,23 @@ public class ZhihuQuestionBasicService {
     }
 
     /**
-     * 获取未处理的 百度结果  知乎question
+     * 获取未处理的 百度结果 为知乎question
+     * 获取 qid
+     *
      * @return
      */
-    public List<KeywordBaiduSearchResult> findListZhihuQuestion() {
+    public List<KeywordBaiduSearchResult> findListZhihuQuestionGenQid() {
         List<KeywordBaiduSearchResult> list = keywordBaiduSearchResultMapper.findListBySite("%" + prefix + "%", 100,SITE_ZHIHU);
         List<KeywordBaiduSearchResult> results = new ArrayList<>();
         List<Integer> qids = new ArrayList<>();
 
 
         if (list != null && list.size() > 0) {
-            for (KeywordBaiduSearchResult url : list) {
-                int qid = findQid(url.getUrlReal(), prefix);
-                if (qid != 0 && qids.indexOf(qid) < 0) {
+            for (KeywordBaiduSearchResult result : list) {
+                int qid = findQid(result.getUrlReal(), prefix);
+                if (qid != 0 && qids.indexOf(qid) < 0) {//有效的 qid，而且为本次处理不重复
                     qids.add(qid);
-                    results.add(url);
+                    results.add(result);
                 }
             }
         }
