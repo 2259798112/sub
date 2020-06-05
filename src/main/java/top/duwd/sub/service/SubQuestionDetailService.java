@@ -118,8 +118,11 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
 
         //获取1min内的ip订单
         try {
-            htmlString = requestBuilder.getWithProxy(url, hMap, proxy);
-        } catch (SocketTimeoutException e) {
+            if (proxy != null){
+                htmlString = requestBuilder.getWithProxy(url, hMap, proxy);
+            }else {
+                htmlString = requestBuilder.get(url, hMap);
+            }        } catch (SocketTimeoutException e) {
             log.error("connect timed out {}", e.getMessage());
             //代理失效
             return Const.PROXY_INVALID;
@@ -165,7 +168,11 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
 
         //获取1min内的ip订单
         try {
-            htmlString = requestBuilder.getWithProxy(url, hMap, proxy);
+            if (proxy != null){
+                htmlString = requestBuilder.getWithProxy(url, hMap, proxy);
+            }else {
+                htmlString = requestBuilder.get(url, hMap);
+            }
         } catch (SocketTimeoutException e) {
             log.error("connect timed out {}", e.getMessage());
             //代理失效

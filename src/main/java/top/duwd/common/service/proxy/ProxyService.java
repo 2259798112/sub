@@ -1,5 +1,6 @@
 package top.duwd.common.service.proxy;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.RowBounds;
@@ -69,6 +70,7 @@ public class ProxyService {
     public Proxy getProxyAndSaveDB() {
         //从网络获取最新IP
         JSONObject moguProxy = ProxyUtil.getMoguProxy();
+        log.info("获取 mogu 最新IP=[{}]", JSON.toJSONString(moguProxy));
         if (moguProxy != null) {
             ProxyEntity proxyEntity = new ProxyEntity();
             String ip = moguProxy.getString("ip");
