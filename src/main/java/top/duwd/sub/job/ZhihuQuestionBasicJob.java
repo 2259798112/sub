@@ -1,5 +1,6 @@
 package top.duwd.sub.job;
 
+import com.alibaba.fastjson.JSON;
 import com.cxytiandi.elasticjob.annotation.ElasticJobConf;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
@@ -73,7 +74,7 @@ public class ZhihuQuestionBasicJob implements SimpleJob {
                 //使用代理
                 proxy = proxyService.getProxy(1);
             }
-
+            log.info("proxy =[{}]", JSON.toJSONString(proxy));
             for (ZhihuQuestionBasic basic : list) {
                 int i = subQuestionDetailService.parseBasic(basic.getQid(),basic.getId(), proxy);
             }
