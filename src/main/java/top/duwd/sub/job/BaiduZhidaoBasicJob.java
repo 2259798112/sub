@@ -11,11 +11,12 @@ import top.duwd.common.domain.sub.entity.BaiduZhidaoBasic;
 import top.duwd.common.domain.sub.entity.KeywordBaiduSearchResult;
 import top.duwd.sub.service.BaiduSearchResultService;
 import top.duwd.sub.service.BaiduZhidaoService;
+import top.duwd.sub.service.KeywordBaiduRealService;
 
 import java.util.Date;
 import java.util.List;
 
-@ElasticJobConf(name = "BaiduZhidaoBasicJob", cron = "0 */1 * * * ?", shardingTotalCount = 1, description = "百度知道快照")
+@ElasticJobConf(name = "BaiduZhidaoBasicJob", cron = "*/30 * * * * ?", shardingTotalCount = 1, description = "百度知道快照")
 @Slf4j
 public class BaiduZhidaoBasicJob implements SimpleJob {
 
@@ -23,13 +24,17 @@ public class BaiduZhidaoBasicJob implements SimpleJob {
     private BaiduZhidaoService baiduZhidaoService;
     @Autowired
     private BaiduSearchResultService baiduSearchResultService;
-
+    @Autowired
+    private KeywordBaiduRealService baiduRealJob;
+    public static final String site = "百度知道";
     @Override
     public void execute(ShardingContext shardingContext) {
+        int shardingItem = shardingContext.getShardingItem();
         //去重
         //要处理的结果
         //获取基本信息
         //获取pv
+        baiduRealJob.genRealUrl(site);
         run();
         parse();
     }
@@ -58,7 +63,7 @@ public class BaiduZhidaoBasicJob implements SimpleJob {
     }
 
     public void parse() {
-        List<BaiduZhidaoBasic> list = baiduZhidaoService.findListNoParse(100, 3, 60);
+        List<BaiduZhidaoBasic> list = baiduZhidaoService.findListNoParse(20, 3, 60);
         if (list != null && list.size() > 0) {
             for (BaiduZhidaoBasic entity : list) {
                 BaiduZhidaoBasic baiduZhidaoBasic = new BaiduZhidaoBasic();
@@ -70,8 +75,9 @@ public class BaiduZhidaoBasicJob implements SimpleJob {
                     log.error("解析百度知道 异常 [entity={}]", JSON.toJSONString(baiduZhidaoBasic));
                     baiduZhidaoBasic.setCount(entity.getCount() + 1);
                     baiduZhidaoService.update(baiduZhidaoBasic);
-                    break;
+                    continue;
                 }
+                log.info("解析百度知道 成功 [entity={}]", JSON.toJSONString(baiduZhidaoBasic));
                 baiduZhidaoService.update(baiduZhidaoBasic);
             }
         }

@@ -2,6 +2,7 @@ package top.duwd.sub.job;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.cxytiandi.elasticjob.annotation.ElasticJobConf;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-//@ElasticJobConf(name = "KeywordParseJob", cron = "0 */5 * * * ?", shardingTotalCount = 1, description = "关键词导入")
+@ElasticJobConf(name = "KeywordParseJob", cron = "0 */5 * * * ?", shardingTotalCount = 1, description = "关键词导入")
 @Slf4j
 public class KeywordParseJob implements SimpleJob {
     @Autowired
@@ -32,6 +33,8 @@ public class KeywordParseJob implements SimpleJob {
 
     @Override
     public void execute(ShardingContext shardingContext) {
+        int shardingItem = shardingContext.getShardingItem();
+
         run();
     }
 
@@ -90,7 +93,7 @@ public class KeywordParseJob implements SimpleJob {
 
     private void importKeywordChinaZ(KeywordUser keywordUser) {
         //获取 百度相关词
-        List<Keyword> moreFromChinaZ = keywordService.findKeywordFromChinaZ(keywordUser.getKeywordMain());
+        List<Keyword> moreFromChinaZ = keywordService.findKeywordFromChinaZ(keywordUser.getKeywordMain(),1,5);
 
         if (moreFromChinaZ == null || moreFromChinaZ.size() == 0) {
 

@@ -16,6 +16,7 @@ import top.duwd.common.mapper.sub.KeywordBaiduSearchResultMapper;
 import top.duwd.dutil.date.DateUtil;
 import top.duwd.dutil.http.RequestBuilder;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -147,7 +148,8 @@ public class BaiduZhidaoService {
         hMap.put("Host", "zhidao.baidu.com");
         String url = String.format("https://zhidao.baidu.com/question/%d.html", qid);
 
-        String page = requestBuilder.get(url, hMap);
+        String page = requestBuilder.getWithCharset(url, hMap, Charset.forName("gbk"));
+
         Document document = Jsoup.parse(page);
         //设置title
         Elements title = document.select("#wgt-ask > h1 > span");
@@ -169,7 +171,7 @@ public class BaiduZhidaoService {
             }
         }
         //设置发布日期
-        Elements datePublished = document.getElementsByAttributeValue("itemprop=", "datePublished");
+        Elements datePublished = document.getElementsByAttributeValue("itemprop", "datePublished");
         if (datePublished != null && datePublished.size() > 0) {
             String timeString = datePublished.first().attr("content");
             //2019-11-08 17:37:18

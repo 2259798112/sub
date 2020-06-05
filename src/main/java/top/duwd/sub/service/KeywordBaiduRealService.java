@@ -1,4 +1,4 @@
-package top.duwd.sub.job;
+package top.duwd.sub.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,13 +6,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import top.duwd.common.domain.sub.entity.KeywordBaiduSearchResult;
 import top.duwd.dutil.http.RequestBuilderCustom;
-import top.duwd.sub.service.BaiduSearchResultService;
 
 import java.util.List;
 
 @Slf4j
 @Component
-public class KeywordBaiduRealJob {
+public class KeywordBaiduRealService {
     @Autowired
     private BaiduSearchResultService baiduSearchResultService;
     private static final String prefix_baidu = "http://www.baidu.com";

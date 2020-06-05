@@ -144,7 +144,7 @@ public class KeywordService implements IBaseService<Keyword> {
     }
 
     //获取站长之间前5页数据
-    public List<Keyword> findKeywordFromChinaZ(String keyword) {
+    public List<Keyword> findKeywordFromChinaZ(String keyword,int start, int end) {
 
         List<String> keywords = chinaZ.keyword(null, keyword, 1, 5);
         if (keywords == null || keywords.size() == 0) {

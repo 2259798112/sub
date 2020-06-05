@@ -7,7 +7,6 @@ import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import top.duwd.common.config.Const;
 import top.duwd.common.domain.sub.entity.Keyword;
 import top.duwd.dutil.http.html.Baidu;
 import top.duwd.dutil.http.html.dto.BaiduSearchResult;
@@ -16,7 +15,6 @@ import top.duwd.sub.service.KeywordService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @ElasticJobConf(name = "KeywordBaiduJob", cron = "0 */1 * * * ?", shardingTotalCount = 1, description = "关键词Baidu")
 @Slf4j
@@ -30,6 +28,7 @@ public class KeywordBaiduJob implements SimpleJob {
 
     @Override
     public void execute(ShardingContext shardingContext) {
+        int shardingItem = shardingContext.getShardingItem();
         run();
     }
 
@@ -39,9 +38,6 @@ public class KeywordBaiduJob implements SimpleJob {
      * 3，取 百度PC 百度Mobile 获取具体搜索结果
      */
     public void run() {
-
-        boolean wait = true;
-        //1,获取最近未处理的 user keyword
         int size = 10;
         int count = 3;
         List<Keyword> list = keywordService.findKeyworToBaiduSearch(count, size);
@@ -50,19 +46,14 @@ public class KeywordBaiduJob implements SimpleJob {
         } else {
             ArrayList<BaiduSearchResult> BaiduSearchResultList = new ArrayList<>();
 
-
-            Map<String, String> pcMap = keywordService.getBaiduHeaderMap(Const.BaiduPC);
-            Map<String, String> moMap = keywordService.getBaiduHeaderMap(Const.BaiduMo);
-
             for (Keyword keyword : list) {
                 int countPC = keyword.getCounter();
                 int countMobile = keyword.getCounterM();
 
                 if (keyword.getCounter()<3){
 
-//                    BaiduSearchResult pcSearch = baidu.searchPC(pcMap, keyword.getKeywordTail(), 1, null,wait);
                     BaiduSearchResult pcSearch = baidu.searchPCBySelenium(keyword.getKeywordTail(), 1);
-                    log.info("baidu PC search [BaiduSearchResult={}]", JSON.toJSONString(pcSearch,SerializerFeature.PrettyFormat));
+                    log.debug("baidu PC search [BaiduSearchResult={}]", JSON.toJSONString(pcSearch,SerializerFeature.PrettyFormat));
                     if (pcSearch != null && pcSearch.getItems().size() > 0) {
                         BaiduSearchResultList.add(pcSearch);
                         countPC = 3;
@@ -73,9 +64,8 @@ public class KeywordBaiduJob implements SimpleJob {
                 }
 
                 if (keyword.getCounterM()<3){
-//                    BaiduSearchResult moSearch = baidu.searchM(moMap, keyword.getKeywordTail(), 1, null,wait);
                     BaiduSearchResult moSearch = baidu.searchMobileBySelenium(keyword.getKeywordTail(), 1);
-                    log.info("baidu mobile search [BaiduSearchResult={}]", JSON.toJSONString(moSearch, SerializerFeature.PrettyFormat));
+                    log.debug("baidu mobile search [BaiduSearchResult={}]", JSON.toJSONString(moSearch, SerializerFeature.PrettyFormat));
                     if (moSearch != null && moSearch.getItems().size()>0) {
                         //重定向
                         BaiduSearchResultList.add(moSearch);
