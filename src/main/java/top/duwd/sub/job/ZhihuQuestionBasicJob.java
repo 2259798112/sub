@@ -69,7 +69,7 @@ public class ZhihuQuestionBasicJob implements SimpleJob {
         List<ZhihuQuestionBasic> list = zhihuQuestionBasicService.findNoParse(100);
         if (list != null && list.size() > 0) {
             Proxy proxy = null;
-            if (list.size() > 10) {
+            if (list.size() > 20) {
                 //使用代理
                 proxy = proxyService.getProxy(1);
             }
