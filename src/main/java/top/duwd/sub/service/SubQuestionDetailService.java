@@ -123,7 +123,7 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
             }else {
                 htmlString = requestBuilder.get(url, hMap);
             }        } catch (SocketTimeoutException e) {
-            log.error("connect timed out {}", e.getMessage());
+            log.error("connect timed out {} proxy = {} url=[{}]", e.getMessage(),JSON.toJSONString(proxy),url);
             //代理失效
             return Const.PROXY_INVALID;
         } catch (IOException e) {
@@ -174,7 +174,7 @@ public class SubQuestionDetailService implements IBaseService<SubQuestionDetail>
                 htmlString = requestBuilder.get(url, hMap);
             }
         } catch (SocketTimeoutException e) {
-            log.error("connect timed out {}", e.getMessage());
+            log.error("connect timed out {} proxy = {} url=[{}]", e.getMessage(),JSON.toJSONString(proxy),url);
             //代理失效
             return Const.PROXY_INVALID;
         } catch (IOException e) {
