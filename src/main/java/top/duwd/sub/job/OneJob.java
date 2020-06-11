@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import top.duwd.common.domain.sub.entity.Keyword;
 import top.duwd.dutil.file.FileUtil;
 import top.duwd.sub.service.KeywordService;
@@ -15,7 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
-@Component
+//@Component
 public class OneJob {
     @Autowired
     private KeywordService keywordService;
