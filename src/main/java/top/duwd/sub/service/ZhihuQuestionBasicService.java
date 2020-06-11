@@ -105,6 +105,10 @@ public class ZhihuQuestionBasicService {
     @Transactional
     public int save(KeywordBaiduSearchResult searchResult) {
         int qid = findQid(searchResult.getUrlReal(), prefix);
+        return save(qid);
+    }
+
+    public int save(int qid) {
         Example example = new Example(ZhihuQuestionBasic.class);
         example.createCriteria().andEqualTo("qid",qid);
         int count = mapper.selectCountByExample(example);

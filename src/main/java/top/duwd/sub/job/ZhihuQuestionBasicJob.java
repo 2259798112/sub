@@ -7,12 +7,10 @@ import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import top.duwd.common.domain.sub.entity.KeywordBaiduSearchResult;
+import top.duwd.common.domain.sub.entity.ZhihuHot;
 import top.duwd.common.domain.sub.entity.ZhihuQuestionBasic;
 import top.duwd.common.service.proxy.ProxyService;
-import top.duwd.sub.service.BaiduSearchResultService;
-import top.duwd.sub.service.KeywordBaiduRealService;
-import top.duwd.sub.service.SubQuestionDetailService;
-import top.duwd.sub.service.ZhihuQuestionBasicService;
+import top.duwd.sub.service.*;
 
 import java.net.Proxy;
 import java.util.Date;
@@ -31,6 +29,8 @@ public class ZhihuQuestionBasicJob implements SimpleJob {
     private KeywordBaiduRealService baiduRealJob;
     @Autowired
     private ProxyService proxyService;
+    @Autowired
+    private ZhihuHotService zhihuHotService;
 
     public static final String S = "/";
     public static final String SITE_ZHIHU = "知乎";
@@ -41,6 +41,7 @@ public class ZhihuQuestionBasicJob implements SimpleJob {
 
         baiduRealJob.genRealUrl(SITE_ZHIHU); //更新real url
         run();//去重数据
+        runHot();
         parse();
     }
 
@@ -66,6 +67,16 @@ public class ZhihuQuestionBasicJob implements SimpleJob {
         }
     }
 
+    public void runHot(){
+        List<ZhihuHot> list = zhihuHotService.findList(200);
+        for (ZhihuHot zhihuHot : list) {
+            int save = zhihuQuestionBasicService.save(zhihuHot.getQid());
+            if (save > 0){
+                zhihuHotService.update(zhihuHot);
+            }
+        }
+    }
+
     public void parse() {
         List<ZhihuQuestionBasic> list = zhihuQuestionBasicService.findNoParse(100);
         if (list != null && list.size() > 0) {
@@ -74,7 +85,7 @@ public class ZhihuQuestionBasicJob implements SimpleJob {
                 //使用代理
                 proxy = proxyService.getProxy(1);
             }
-            log.info("proxy =[{}]", JSON.toJSONString(proxy));
+            log.info("知乎 解析 proxy =[{}]", JSON.toJSONString(proxy));
             for (ZhihuQuestionBasic basic : list) {
                 int i = subQuestionDetailService.parseBasic(basic.getQid(),basic.getId(), proxy);
             }
