@@ -7,6 +7,8 @@ import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import top.duwd.common.domain.sub.entity.Keyword;
 import top.duwd.dutil.http.html.Baidu;
 import top.duwd.dutil.http.html.dto.BaiduSearchResult;
@@ -18,6 +20,7 @@ import java.util.List;
 
 @ElasticJobConf(name = "KeywordBaiduJob", cron = "0 */1 * * * ?", shardingTotalCount = 1, description = "关键词Baidu")
 @Slf4j
+@Component
 public class KeywordBaiduJob implements SimpleJob {
     @Autowired
     private KeywordService keywordService;
@@ -37,6 +40,7 @@ public class KeywordBaiduJob implements SimpleJob {
      * 2，获取百度PC 百度Mobile 所需header cookie
      * 3，取 百度PC 百度Mobile 获取具体搜索结果
      */
+    @Scheduled(cron = "0 */1 * * * ?")
     public void run() {
         int size = 10;
         int count = 3;
